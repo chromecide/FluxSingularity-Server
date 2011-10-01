@@ -1,14 +1,13 @@
 <?php 
 class KernelDataEventListener extends KernelDataEntity{
 	public function __construct($config){
-		
-		parent::__construct($config);
+		parent::__construct();
 		
 		$this->_ClassName = 'Kernel.Data.Event.Listener';
 		$this->_ClassTitle='Event Listener';
 		$this->_ClassDescription = 'Listens for Events and fires the supplied process';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.7.0';
 		
 		$this->collectionName = 'Kernel.Events.Listeners';
 		

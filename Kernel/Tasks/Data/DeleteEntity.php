@@ -7,7 +7,7 @@ class KernelTasksDataDeleteEntity extends KernelTasksTask{
 		$this->_ClassTitle='Create an Entity Instance';
 		$this->_ClassDescription = 'This task will create an Entity Instance';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 
 		//Inputs
 		$this->inputs['Store'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Store', 'Type'=>'Kernel.Data.DatStore', 'Required'=>true));

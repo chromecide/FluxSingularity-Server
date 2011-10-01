@@ -21,7 +21,7 @@ class KernelTasksTask extends KernelObject{
 		$this->_ClassTitle='Kernel Task Base Object';
 		$this->_ClassDescription = 'Base object for all tasks in the system';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$enabledDef = array('Name'=>'Enabled', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'DefaultValue'=>false, 'AllowList'=>false);
 		$resetDef = array('Name'=>'Reset', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'DefaultValue'=>false, 'AllowList'=>false);

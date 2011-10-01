@@ -7,7 +7,7 @@ class KernelTasksMathModulus extends KernelTasksTask{
 		$this->_ClassTitle='Modulus';
 		$this->_ClassDescription = '';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.6.0';
 		
 		//Inputs
 

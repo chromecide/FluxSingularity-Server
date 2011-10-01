@@ -30,7 +30,7 @@ class KernelDataEntity extends KernelData{
 		$this->_ClassTitle='Kernel Entity Base Object';
 		$this->_ClassDescription = 'Entity Objects are Data Objects that, when saved, require a Unique ID.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->data = array();
 		

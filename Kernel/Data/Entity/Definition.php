@@ -1,13 +1,13 @@
 <?php
 class KernelDataEntityDefinition extends KernelDataEntity{
 	public function __construct($data){
-		parent::__construct($data);
+		parent::__construct();
 		
 		$this->_ClassName = 'Kernel.Data.Entity.Definition';
 		$this->_ClassTitle='Entity Definition';
 		$this->_ClassDescription = 'Used to create Entity Definitions';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.7.0';
 		
 		$this->collectionName = 'Kernel.Data.Entity.Definitions';
 		

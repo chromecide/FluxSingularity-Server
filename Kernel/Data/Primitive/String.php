@@ -7,7 +7,7 @@ Class KernelDataPrimitiveString extends KernelDataPrimitive{
 		$this->_ClassTitle ='String Primitive';
 		$this->_ClassDescription = 'String Objects store a standard string of characters';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
-		$this->_ClassVersion = '0.2.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		$this->data = '';
 		if($data){

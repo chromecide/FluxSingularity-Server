@@ -7,7 +7,7 @@ class KernelTasksSystemCreateKernelFileList extends KernelTasksTask{
 		$this->_ClassTitle='Create Kernel File List';
 		$this->_ClassDescription = 'This Task will create a list of the Kernel Files in the supplied format';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.6.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		//Inputs
 		$this->inputs['Format'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Format', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));

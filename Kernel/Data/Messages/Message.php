@@ -1,7 +1,7 @@
 <?php
 class KernelDataMessagesMessage extends KernelDataEntity{
 	public function __construct($data){
-		parent::__construct($data);
+		parent::__construct();
 		
 		$this->collectionName = 'Kernel.Messaging.Messages';
 		
@@ -9,7 +9,7 @@ class KernelDataMessagesMessage extends KernelDataEntity{
 		$this->_ClassTitle='Base Message Objecy';
 		$this->_ClassDescription = 'Used to handle message passing throught the system';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.6.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->fields['SourceID'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Source ID', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->fields['DestinationID'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Destination ID', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>true));

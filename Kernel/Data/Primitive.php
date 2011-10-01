@@ -7,7 +7,7 @@ class KernelDataPrimitive extends KernelData{
 		$this->_ClassTitle='Kernel Primitive Data Base Object';
 		$this->_ClassDescription = 'Primitive Data Objects are Simple Data Objects that, when saved, do not require a Unique ID.  Primitive Data Objects form the basis for Entity Attribute Values.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.9.0';
 	}
 	
 	public function setValue($value){

@@ -7,7 +7,7 @@ class KernelDataPrimitiveConditionGroup extends KernelDataPrimitive{
 		$this->_ClassTitle='Search Condition Primitive';
 		$this->_ClassDescription = 'Condition Objects are used for searching entity data objects';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.8.0';
 		
 		$this->fields['Type'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Type', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->fields['Conditions'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Conditions', 'Type'=>'Kernel.Data.Primitive.Condition', 'Required'=>true, 'AllowList'=>true));

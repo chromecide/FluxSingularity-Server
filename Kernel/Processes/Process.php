@@ -30,7 +30,7 @@ class KernelProcessesProcess extends KernelObject{
 		$this->_ClassTitle='Base Process Object';
 		$this->_ClassDescription = 'The basis for all Processes within the Flux Singularity platform';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->inputs['Enabled'] = array('Enabled', 'Kernel.Data.Primitive.Boolean', true);
 		

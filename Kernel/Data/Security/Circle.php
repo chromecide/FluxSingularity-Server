@@ -8,7 +8,7 @@ class KernelDataSecurityCircle extends KernelDataEntity{
 		$this->_ClassTitle='Security Circle Entity';
 		$this->_ClassDescription = 'Used to store information about security circles';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.7.0';
 		
 		$this->collectionName = 'Kernel.Security.Circles';
 		$this->setValue('KernelClass', new KernelDataPrimitiveString('Kernel.Data.Security.Circle'));

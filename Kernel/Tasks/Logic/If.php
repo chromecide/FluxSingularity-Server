@@ -13,7 +13,7 @@ class KernelTasksLogicIf extends KernelTasksTask{
 		$this->_ClassTitle='Logical IF Task';
 		$this->_ClassDescription = 'This task takes 2 inputs and a comparison operator and outputs whether the comparison succeeded';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->inputs['Input1'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input 1', 'Type'=>'Kernel.Data.Primitive', 'Required'=>false));
 		$this->inputs['Operator'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Operator', 'Kernel.Data.Primitive.String',  'Required'=>false));

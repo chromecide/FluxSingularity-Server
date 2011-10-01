@@ -1,46 +1,15 @@
-# Flux Singularity Server
+### Class Version Number Notes
+Due the intention of having a self describing system, there is some method to the madness of the way the Classes are Versioned.
 
-## Introduction
-This project encompasses the PHP Server Framework for Flux Singularity.  
-
-## Using Flux Singularity Server
-  
-The following is the minimum requirements for a PHP file to have access to the Flux Singularity Kernel  
-  
->//Load the Data Loader and Utility Classes  
->require\_once('../Kernel/DataClassLoader.php');  
->require\_once('../Kernel/DataNormalisation.util.php');  
->require\_once('../Kernel/DataValidation.util.php');  
-  
->//Add the Kernel Path to the Data Loader  
->DataClassLoader::addPath('Kernel', realpath('../'));  
->//If using Modules outside of the Core Kernel, add the Module path to the Data Loader
->DataClassLoader::addPath('Kernel', realpath('../'));  
->  
->//Create an Instance of the Flux Singularity Kernel  
->$FSKernel = DataClassLoader::createInstance('Kernel');  
-  
-## Examples
-  
-### Run a Task  
-  
->//Create the Task and Input Variables  
->$taskName = 'Kernel.Data.Math.Add';  
->$taskInputs = array(  
->  'Input1'=>3,  
->  'Input2'=>5,  
->);
->    
->//run the task through the Kernel Instance, which will return a Task Object  
->$task = $FSKernel->runTask($taskName, $inputs);  
->  
->//print the value of the 'Result' Output  
->echo $task->getTaskOutput('Result')->getValue();  
-  
-### Run a Process  
-  
-### Fire an Event  
-  
-### Build and Run a Temporary Process  
-  
-### Saving and Loading Data  
+0.0.1 - Initial Constructs Created, but it's essentially a place holder
+0.1.0 - Above plus PHP Class Comments
+0.2.0 - Above plus Inputs/Outputs/Field Definitions in place
+0.3.0 - Above plus custom loadData/set and get functions
+0.4.0 - Functional Development is in progress
+0.5.0 - Functional Development Complete
+0.6.0 - Development testing Complete
+0.7.0 - Above and is ready for testing
+0.8.0 - Initial Instance Creation tests have been completed successfully
+0.9.0 - Save/Load/Search testing has been completed successfully
+0.9.9 - Has been tested successfully within a process
+1.0.0 - Release Version

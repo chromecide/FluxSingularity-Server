@@ -7,7 +7,7 @@ class KernelDataPrimitiveFieldDefinition extends KernelDataPrimitiveNamedList{
 		$this->_ClassTitle='Error Primitive Object';
 		$this->_ClassDescription = 'Used to create Error reports';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.2.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		$this->addItem('Name', null);
 		$this->addItem('Type', 'Kerrnel.Data.Primitive.String');

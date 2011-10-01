@@ -12,7 +12,7 @@ class KernelEventsEvent extends KernelObject{
 		$this->_ClassTitle='Base Event Object';
 		$this->_ClassDescription = 'The basis for all events within the Flux Singularity';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.3.0';
 		
 		$this->dataClassName = 'Kernel.Events.Event';
 	}

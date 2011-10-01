@@ -13,7 +13,7 @@ class KernelTasksLogicAnd extends KernelTasksTask{
 		$this->_ClassTitle='Logical AND Task';
 		$this->_ClassDescription = 'Succeeds if all Inputs are true';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		$this->inputs['Inputs'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input List', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>true));
 		
@@ -28,8 +28,6 @@ class KernelTasksLogicAnd extends KernelTasksTask{
 		
 		$inputs = $this->getTaskInput('Inputs');
 		$inputCount = $inputs->Count();
-		//print_r($inputs);
-		//echo 'AND Input Count:'.$inputCount.'<br/>';
 		
 		$succeeded = true;
 		

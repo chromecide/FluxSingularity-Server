@@ -9,7 +9,7 @@ class KernelData extends KernelObject{
 		$this->_ClassTitle = 'Kernel Data Base Object';
 		$this->_ClassDescription = 'Kernel Data Base Object';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->data = null;
 	}

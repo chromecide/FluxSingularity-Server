@@ -7,7 +7,7 @@ class KernelEventsProcessesProcessExecuted extends KernelEventsEvent{
 		$this->_ClassTitle='Process Executed Event';
 		$this->_ClassDescription = 'This event is fired whenever a Process is successfully executed within the system.  This is deisgned primarily for debugging purposes, use with caution';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.2.0';
 		
 		$this->outputs['Process'] = array('Process', 'Kernel.Data.Primitive.String', true, true);
 	}

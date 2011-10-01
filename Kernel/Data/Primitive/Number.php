@@ -7,7 +7,7 @@ class KernelDataPrimitiveNumber extends KernelDataPrimitive{
 		$this->_ClassTitle='Number Primitive Object';
 		$this->_ClassDescription = 'For creating Numerical Values';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.2.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->data=0;
 		if($data){

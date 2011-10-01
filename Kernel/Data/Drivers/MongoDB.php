@@ -13,7 +13,7 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 		$this->_ClassTitle='MongoDB Database Driver';
 		$this->_ClassDescription = 'A MongoDB Database driver for use with Flux Singularity Data Sources';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.4.0';
 		
     	$this->connect($config);
     	

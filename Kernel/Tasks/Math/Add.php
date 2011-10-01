@@ -8,7 +8,7 @@ class KernelTasksMathAdd extends KernelTasksTask{
 		$this->_ClassTitle='Add';
 		$this->_ClassDescription = 'Take 2 numbers as inputs, adds them together and outputs the result.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.6.0';
 
 		//Inputs
 		$this->inputs['Input1'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input1', 'Type'=>'Kernel.Data.Primitive.Number', 'Required'=>true, 'AllowList'=>false));

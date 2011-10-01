@@ -13,7 +13,7 @@ class KernelTasksDataJoinStrings extends KernelTasksTask{
 		$this->_ClassTitle='Join Data String';
 		$this->_ClassDescription = 'Joins Multiple Data Strings';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		$this->inputs['Strings'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Strings', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>true));
 		

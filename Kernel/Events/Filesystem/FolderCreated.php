@@ -7,7 +7,7 @@ class KernelEventsFilesystemFolderCreated extends KernelEventsEvent{
 		$this->_ClassTitle='Folder Created Event';
 		$this->_ClassDescription = 'This event is fired whenever a Folder is successfully created within the system.  This is deisgned primarily for debugging purposes, use with caution';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.2.0';
 		
 		$this->outputs['Folder'] = array('Folder', 'Kernel.Data.Filesystem.Folder', true, true);
 	}

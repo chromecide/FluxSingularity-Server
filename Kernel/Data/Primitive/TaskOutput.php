@@ -7,7 +7,7 @@ class KernelDataPrimitiveTaskOutput extends KernelDataPrimitiveNamedList{
 		$this->_ClassTitle='Task Input Primitive';
 		$this->_ClassDescription = 'String Objects store a standard string of characters';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.6.0';
+		$this->_ClassVersion = '0.8.0';
 		
 		//$this->data = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');	
 		

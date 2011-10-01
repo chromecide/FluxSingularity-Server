@@ -10,7 +10,7 @@ class Kernel{
 		$meta->Title = 'Core Kernel Object';
 		$meta->Description = 'Provides the Core Entry Point for Flux Singularity';
 		$meta->Author = 'Justin Pradier';
-		$meta->Version = '0.5.0';
+		$meta->Version = '0.4.0';
 		
 		return $meta;
 	}

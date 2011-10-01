@@ -7,7 +7,7 @@ class KernelTasksDataSetEntityAttribute extends KernelTasksTask{
 		$this->_ClassTitle='Set Entity Attribute';
 		$this->_ClassDescription = 'Sets an Entity\'s Attribute Value';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.5.0';
 
 		//Inputs
 		$this->inputs['Entity'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Entity', 'Type'=>'Kernel.Data.Entity', 'Required'=>true));

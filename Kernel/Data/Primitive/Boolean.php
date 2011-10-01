@@ -7,7 +7,7 @@ class KernelDataPrimitiveBoolean extends KernelDataPrimitive{
 		$this->_ClassTitle='Boolean Primitive Object';
 		$this->_ClassDescription = 'Boolean Objects store a true/false yes/no value';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		$this->data = false;
 		

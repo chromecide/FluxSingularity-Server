@@ -10,7 +10,7 @@ class KernelDataPrimitiveDateTime extends KernelDataPrimitive{
 		$this->_ClassTitle='Date and Time Primitive';
 		$this->_ClassDescription = 'Used for storing date and time values';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.2.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		if(!$data){
 			$this->data = strtotime('now');

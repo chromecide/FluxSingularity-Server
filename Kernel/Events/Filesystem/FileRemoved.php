@@ -7,7 +7,7 @@ class KernelEventsFilesystemFileRemoved extends KernelEventsEvent{
 		$this->_ClassTitle='File Removed Event';
 		$this->_ClassDescription = 'This event is fired whenever a file is successfully Removed from the system.  This is deisgned primarily for debugging purposes, use with caution';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.2.0';
 		
 		$this->outputs['File'] = array('File', 'Kernel.Data.Filesystem.File', true, true);
 	}

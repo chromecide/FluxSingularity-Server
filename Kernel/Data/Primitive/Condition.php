@@ -7,7 +7,7 @@ class KernelDataPrimitiveCondition extends KernelDataPrimitive{
 		$this->_ClassTitle='Search Condition Primitive';
 		$this->_ClassDescription = 'Condition Objects are used for searching entity data objects';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.8.0';
 		
 		$this->fields[] = array('Attribute', 'Kernel.Data.Primitive.String', true, false);
 		$this->fields[] = array('Operator', 'Kernel.Data.Primitive.String', true, false);
