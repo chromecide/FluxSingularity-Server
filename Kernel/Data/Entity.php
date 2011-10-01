@@ -44,10 +44,13 @@ class KernelDataEntity extends KernelData{
 		$this->fields['KernelModifiedBy'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedBy', 'Type'=>'Kernel.Data.Security.User', 'Required'=>false));
 		$this->fields['KernelModifiedDate'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedAt', 'Type'=>'Kernel.Data.Primitive.DateTime', 'Required'=>false));
 		
-		if($data['extends']){
-			foreach($data['extends'] as $extend){
-				$this->extendClass($extend);	
+		if($data){
+			if($data['extends']){
+				foreach($data['extends'] as $extend){
+					$this->extendClass($extend);	
+				}	
 			}	
+			$this->loadData($data);
 		}
 
 		if(self::$kernelStore){
@@ -82,10 +85,10 @@ class KernelDataEntity extends KernelData{
 		if($data['Store']){
 			$this->store = $data['Store'];
 		}
-
 		$fields = $this->getFields();
 		
 		foreach($fields as $fieldName=>$fieldCfg){
+			
 			if($data[$fieldName]){
 				if($fieldCfg instanceof KernelDataPrimitiveFieldDefinition){
 					$type = $fieldCfg->getValue('Type')->getValue();
@@ -97,8 +100,21 @@ class KernelDataEntity extends KernelData{
 						$this->setValue($fieldName, $data[$fieldName]);
 					}else{
 						if($allowList){
-							if($fieldCfg instanceof KernelDataPrimitiveList){
-								
+							if($data[$fieldName] instanceof KernelDataPrimitiveList){
+								$this->setValue($fieldName, $data[$fieldName]);
+							}else{
+								$value = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+								if(is_array($data[$fieldName])){
+									foreach($data[$fieldName] as $item){
+										if($item instanceof $type){
+											$value->addItem($item);
+										}else{
+											$value->addItem(DataClassLoader::createInstance($type, $item));
+										}
+									}
+								}else{
+									$value->addItem(DataClassLoader::createInstance($type, $data[$fieldName]));
+								}
 							}
 						}else{
 							$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));	
@@ -109,8 +125,7 @@ class KernelDataEntity extends KernelData{
 					echo '<br/><br/><Br/>';
 				}	
 			}
-			//$fieldCfg->getValue('Type')->getValue().'<br/>';
-			
+			//$fieldCfg->getValue('Type')->getValue().'<br/>';	
 		}
 	}
 	
