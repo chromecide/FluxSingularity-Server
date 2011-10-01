@@ -15,33 +15,26 @@ class KernelDataPrimitiveDateTime extends KernelDataPrimitive{
 		if(!$data){
 			$this->data = strtotime('now');
 		}else{
-			$this->data = $data;
+			$this->data = strtotime($data);
 		}
 	}
 	
-	public function set($value){
+	public function setValue($value){
 		//parse formats
 		
 		$this->data = $value;
 	}
 	
-	public function get($format){
+	public function getValue($format){
 		if(!$format){
 			$format = $this->defaultFormat;
 		}
+		
 		if($format=='TIMESTAMP'){
 			return $this->data;
 		}else{
 			return date($format, $this->data);
 		}
-	}
-	
-	public function getTime($format){
-		
-	}
-	
-	public function getDate($format){
-		
 	}
 }
 

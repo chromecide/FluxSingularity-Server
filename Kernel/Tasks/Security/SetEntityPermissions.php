@@ -1,11 +1,11 @@
 <?php
-class KernelTasksProcessesRunProcess extends KernelTasksTask{
+class KernelTasksSecuritySetEntityPermissions extends KernelTasksTask{
 	public function __construct(){
 		parent::__construct();
 		
-		$this->_ClassName = 'Kernel.Tasks.Processes.RunProcess';
-		$this->_ClassTitle = 'Run Process';
-		$this->_ClassDescription = 'Run a Process';
+		$this->_ClassName = 'Kernel.Tasks.Security.SetEntityPermissions';
+		$this->_ClassTitle='Set Entity Permissions';
+		$this->_ClassDescription = 'Sets the Security Permissions for a Data Entity';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.0.1';
 	}

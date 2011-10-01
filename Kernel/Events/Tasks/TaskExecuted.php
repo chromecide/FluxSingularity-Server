@@ -1,5 +1,5 @@
 <?php
-class KernelEventsTaskesTaskExecuted extends KernelEventsEvent{
+class KernelEventsTasksTaskExecuted extends KernelEventsEvent{
 	public function __construct(){
 		parent::__construct();
 		

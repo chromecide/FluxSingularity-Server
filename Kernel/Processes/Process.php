@@ -190,15 +190,11 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function processTokens(){
-		//echo 'PROCESSING TOKENS<Br/>';
 		$tokens = $this->tokens;
 		
 		$this->trace[] = $tokens;
 		foreach($tokens as $task=>$tokenList){
-			//echo '&nbsp;&nbsp;'.$task.'<br/>';
 			foreach($tokenList as $key=>$item){
-				//echo '&nbsp;&nbsp;&nbsp;&nbsp;'.$key.'<br/>';
-				
 				$taskObj = $this->tasks[$task];
 				
 				if($this->completedTasks[$task]){

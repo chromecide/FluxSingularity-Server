@@ -8,10 +8,17 @@
 
 class KernelTasksProcessesConvertProcessToJSON extends KernelTasksTask{
 	public function __construct(){
+		parent::__construct();
+		
+		$this->_ClassName = 'Kernel.Tasks.Processes.ValidateProcess';
+		$this->_ClassTitle='Validate Process';
+		$this->_ClassDescription = 'Validates a Process';
+		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
+		$this->_ClassVersion = '0.0.1';
 		
 		$this->inputs['Process'] = array('Process', 'Kernel.Processes.Process', true);
 		$this->outputs['JSONString'] = array('JSONString', 'Kernel.Data.Primitive.String');
-		parent::__construct();
+		
 	}
 	
 	public function runTask(){

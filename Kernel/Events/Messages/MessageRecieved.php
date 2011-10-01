@@ -1,5 +1,5 @@
 <?php
-class KernelEventsMessagesMessageRemovedFromQueue extends KernelEventsEvent{
+class KernelEventsMessagesMessageRecieved extends KernelEventsEvent{
 	public function __construct(){
 		parent::__construct();
 		
