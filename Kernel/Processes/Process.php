@@ -192,14 +192,6 @@ class KernelProcessesProcess extends KernelObject{
 		}
 	}
 	
-	public function processTaskInputs($taskName){
-		$taskMap = $this->taskMap[$taskName];
-		
-		foreach($taskMap as $mapItem){
-			print_r($mapItem);
-		}
-	}
-	
 	public function processTokens(){
 		//echo 'PROCESSING TOKENS<Br/>';
 		$tokens = $this->tokens;
