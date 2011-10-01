@@ -181,9 +181,6 @@ class KernelProcessesProcess extends KernelObject{
 					if(!$targetValue){
 						//see if there is a default value for this item
 						$targetValue = $this->getTaskDefault($targetParts[0], $targetParts[1]);
-						if($targetValue){
-							echo 'set default value for '.$targetParts[0].':'.$targetParts[1].'<br/>';
-						}
 					}
 					
 					$this->setTokenData($targetTask, $targetInput, $targetValue);
@@ -196,6 +193,7 @@ class KernelProcessesProcess extends KernelObject{
 		//echo 'PROCESSING TOKENS<Br/>';
 		$tokens = $this->tokens;
 		
+		$this->trace[] = $tokens;
 		foreach($tokens as $task=>$tokenList){
 			//echo '&nbsp;&nbsp;'.$task.'<br/>';
 			foreach($tokenList as $key=>$item){
@@ -214,17 +212,23 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function processTasks(){
+		$this->trace[] = 'Begin Processing';
 		$this->loops++;
+		$this->trace[] = 'Loop #:'.$this->loops;
 		if($this->loops>$this->maxLoops){
+			$this->trace[] = 'Loop Count Exceeded';
 			$this->addError($this->getClassName(), 'Loop Count Exceeded');
 			return false;
 		}
 		$tokens = $this->tokens;
 		$tasksRun = 0;
+		
 		foreach($this->tasks as $taskName=>$task){
+			$this->trace[] = 'Running Task: '.$taskName;
 			$this->runPreProcessor();
 			$this->processTokens();
 			if($task->isReady()){
+			$this->trace[] = 'Task Ready';
 				try{
 					$task->runTask();
 					$tasksRun++;
@@ -232,6 +236,7 @@ class KernelProcessesProcess extends KernelObject{
 					
 					if($completed->getValue()){
 						$this->completedTasks[$taskName] = true;
+						$this->trace[] = 'Task Completed';
 					}
 				}catch(Exception $e){
 				}
@@ -241,6 +246,8 @@ class KernelProcessesProcess extends KernelObject{
 		if($tasksRun>0){
 			$this->processTasks();
 		}else{
+			$this->trace[] = 'Process Complete';
+			
 			$this->setProcessOutput('Complete', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
 		return true;

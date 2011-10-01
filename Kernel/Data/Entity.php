@@ -122,7 +122,6 @@ class KernelDataEntity extends KernelData{
 		if($class){
 			$classFields = $class->getFields();
 			foreach($classFields as $fieldName=>$fieldCfg){
-				//echo '&nbsp;&nbsp;extending field: '.$fieldName.'<br/>';
 				$this->fields[$fieldName] = $fieldCfg;
 			}
 			$this->extends[$className] = $class;
