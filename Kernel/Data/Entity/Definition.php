@@ -19,6 +19,6 @@ class KernelDataEntityDefinition extends KernelDataEntity{
 		
 		$this->fields['Fields'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Name', 'Type'=>'Kernel.Data.Primitive.FieldDefinition', 'Required'=>true, 'AllowList'=>true));
 		
-		$this->loadData();
+		$this->loadData($data);
 	}
 }
