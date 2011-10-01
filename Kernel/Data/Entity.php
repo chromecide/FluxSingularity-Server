@@ -89,11 +89,20 @@ class KernelDataEntity extends KernelData{
 			if($data[$fieldName]){
 				if($fieldCfg instanceof KernelDataPrimitiveFieldDefinition){
 					$type = $fieldCfg->getValue('Type')->getValue();
+					$allowList = $fieldCfg->getValue('AllowList')->getValue();
+					
 					$className = str_replace('.', '', $type);
+					
 					if($data[$fieldName] instanceof $className){
 						$this->setValue($fieldName, $data[$fieldName]);
 					}else{
-						$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));
+						if($allowList){
+							if($fieldCfg instanceof KernelDataPrimitiveList){
+								
+							}
+						}else{
+							$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));	
+						}
 					}
 				}else{
 					echo $this->getClassName().' - Invalid Field Definition: '.$fieldName;
