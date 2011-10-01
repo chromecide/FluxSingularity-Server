@@ -186,13 +186,6 @@ class KernelProcessesProcess extends KernelObject{
 						}
 					}
 					
-					if($targetTask=='Create Kernel File List'){
-						if($targetInput=='Format'){
-							print_r($targetValue);
-							echo '<br/><br/>';
-						}
-					}
-					
 					$this->setTokenData($targetTask, $targetInput, $targetValue);
 				}	
 			}	
@@ -220,11 +213,6 @@ class KernelProcessesProcess extends KernelObject{
 				
 				if($this->completedTasks[$task]){
 					$taskObj->setTaskOutput('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-				}
-				if($task=='Create Kernel File List'){
-					if($key=='Format'){
-						echo 'Settng format to:'.$item->getValue().'<br/>';
-					}
 				}
 				
 				$taskObj->setTaskInput($key, $item);
