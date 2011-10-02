@@ -5,8 +5,8 @@ class KernelDataEventListener extends KernelDataEntity{
 		
 		$this->_ClassName = 'Kernel.Data.Event.Listener';
 		$this->_ClassTitle='Event Listener';
-		$this->_ClassDescription = 'Listens for Events and fires the supplied process';
-		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
+		$this->_ClassDescription = 'Stores information about Event Listeners.';
+		$this->_ClassAuthor = 'Justin Pradier [justin.pradier@fluxsingularity.com]';
 		$this->_ClassVersion = '0.7.0';
 		
 		$this->collectionName = 'Kernel.Events.Listeners';

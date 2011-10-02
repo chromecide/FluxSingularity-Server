@@ -6,7 +6,7 @@ class KernelDataMessagesMessageQueue extends KernelDataEntity{
 		$this->collectionName = 'Kernel.Messaging.Queues';
 		
 		$this->_ClassName = 'Kernel.Data.Messages.Queue';
-		$this->_ClassTitle='Base Message Object';
+		$this->_ClassTitle='Base Message Queue Object';
 		$this->_ClassDescription = 'Used to handle message passing throught the system';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.4.0';

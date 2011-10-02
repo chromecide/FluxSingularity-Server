@@ -7,7 +7,7 @@ class KernelDataMessagesMessageSource extends KernelDataEntity{
 		
 		$this->_ClassName = 'Kernel.Data.Messages.MessageSource';
 		$this->_ClassTitle='Base Message Source Object';
-		$this->_ClassDescription = 'Used to handle message passing throught the system';
+		$this->_ClassDescription = 'Used for determining Source and Targets of Kernel Messages';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.4.0';
 		
