@@ -13,6 +13,7 @@ class KernelDataPrimitive extends KernelData{
 	public function setValue($value){
 		parent::setValue($value);
 		$this->data = $value;
+		return true;
 	}
 	
 	public function getValue(){

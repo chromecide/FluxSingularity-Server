@@ -2,7 +2,7 @@
 Due the intention of having a self describing system, there is some method to the madness of the way the Classes are Versioned.
 
 0.0.1 - Initial Constructs Created, but it's essentially a place holder  
-0.1.0 - Above plus PHP Class Comments  
+0.1.0 - 
 0.2.0 - Above plus Inputs/Outputs/Field Definitions in place  
 0.3.0 - Above plus custom loadData/set and get functions  
 0.4.0 - Functional Development is in progress  

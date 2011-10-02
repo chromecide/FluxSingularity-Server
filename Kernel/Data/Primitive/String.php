@@ -7,9 +7,10 @@ Class KernelDataPrimitiveString extends KernelDataPrimitive{
 		$this->_ClassTitle ='String Primitive';
 		$this->_ClassDescription = 'String Objects store a standard string of characters';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
-		$this->_ClassVersion = '0.9.9';
+		$this->_ClassVersion = '1.0.0';
 		
 		$this->data = '';
+		
 		if($data){
 			if($data instanceof KernelDataPrimitiveString){
 				$this->data = $data->getValue();
@@ -18,6 +19,15 @@ Class KernelDataPrimitiveString extends KernelDataPrimitive{
 			}
 			
 		}
+	}
+	
+	public function setValue($value){
+		if($value instanceof KernelDataPrimitiveString){
+			$this->data = $value->getValue();
+		}else{
+			$this->data = $value;
+		}
+		return true;
 	}
 }
 ?>
