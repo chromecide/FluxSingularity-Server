@@ -30,19 +30,6 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 		}
 	}
 	
-	public function get(){
-		$ret = null;
-		foreach($this->data as $key=>$item){
-			if($ret){$ret.=', ';}
-			if(in_array('KernelData', class_parents($item))){
-				$ret .=$key.'='.$item->get();
-			}else{
-				$ret .=$key.'='.$item;
-			}
-		}	
-		return $ret;
-	}
-	
 	public function setType($type){
 		$this->listType = $type;
 	}
@@ -63,7 +50,7 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 		$this->addItem($name, $value);
 	}
 	
-	public function getValue($name, $value){
+	public function getValue($name){
 		if(!$name){
 			return $this->toBasicObject();
 		}else{

@@ -43,7 +43,7 @@ echo '<br/>';
 //Number
 echo 'Testing Number Primitive<br/>';
 	$number = DataClassLoader::createInstance('Kernel.Data.Primitive.Number');
-	if($string){
+	if($number){
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($number->getValue()!==null)?$number->getValue():'Null Value').'<br/>';
@@ -58,7 +58,7 @@ echo '<br/>';
 //DateTime
 echo 'Testing DateTime Primitive<br/>';
 	$dateTime = DataClassLoader::createInstance('Kernel.Data.Primitive.DateTime');
-	if($string){
+	if($dateTime){
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue()!==null)?$dateTime->getValue():'Null Value').'<br/>';
@@ -79,8 +79,6 @@ echo 'Testing DateTime Primitive<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('minute') !== null)?$dateTime->getValue('minute'):'Failed').'<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Second Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('second') !== null)?$dateTime->getValue('second'):'Failed').'<br/>';
-		
-		
 		
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Year Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('Year', 1980)?'Passed':'Failed').'<br/>';
@@ -111,22 +109,124 @@ echo 'Testing DateTime Primitive<br/>';
 	}else{
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
 	}
-
-//Error
-
-//FieldDefinition
+echo '<br/>';
 
 //List
+echo 'Testing List Primitive<br/>';
+	$list = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+	
+	if($list){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		echo $list->getValue().'<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 
 //Named List
+echo 'Testing NamedList Primitive<br/>';
+	$namedList = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');
+	
+	if($namedList){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($namedList->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
 
+echo '<br/>';
 
+//Error
+echo 'Testing Error Primitive<br/>';
+	$error = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
+	
+	if($error){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($error->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
+
+//FieldDefinition
+echo 'Testing FieldDefinition Primitive<br/>';
+	$fieldDef = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');
+	
+	if($fieldDef){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($fieldDef->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 
 //TaskInput
+echo 'Testing TaskInput Primitive<br/>';
+	$taskInput = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput');
+	
+	if($taskInput){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($taskInput->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 
 //TaskOutput
+echo 'Testing TaskOutput Primitive<br/>';
+	$taskOutput = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput');
+	
+	if($fieldDef){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($taskOutput->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 
 //Condition
+echo 'Testing Condition Primitive<br/>';
+	$condition = DataClassLoader::createInstance('Kernel.Data.Primitive.Condition');
+	
+	if($fieldDef){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($condition->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 
 //Condition Group
+echo 'Testing ConditionGroup Primitive<br/>';
+	$conditionGroup = DataClassLoader::createInstance('Kernel.Data.Primitive.ConditionGroup');
+	
+	if($fieldDef){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		print_r($conditionGroup->getValue());
+		echo '<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
+
+echo '<br/>';
 ?>
