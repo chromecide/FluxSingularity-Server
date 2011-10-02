@@ -38,7 +38,8 @@ echo 'Testing String Primitive<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($string->getValue() == 'Test')?'Passed':'Failed').'<br/>';
 	}else{
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
-	}echo '<br/>';
+	}
+echo '<br/>';
 //Number
 echo 'Testing Number Primitive<br/>';
 	$number = DataClassLoader::createInstance('Kernel.Data.Primitive.Number');
@@ -53,8 +54,63 @@ echo 'Testing Number Primitive<br/>';
 	}else{
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
 	}
-
+echo '<br/>';
 //DateTime
+echo 'Testing DateTime Primitive<br/>';
+	$dateTime = DataClassLoader::createInstance('Kernel.Data.Primitive.DateTime');
+	if($string){
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Primitive Created<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue()!==null)?$dateTime->getValue():'Null Value').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('1979-07-28')?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Year Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('year') !== null)?$dateTime->getValue('year'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Month Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('month') !== null)?$dateTime->getValue('month'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Day Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('day') !== null)?$dateTime->getValue('day'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Hour Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('hour') !== null)?$dateTime->getValue('hour'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Minute Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('minute') !== null)?$dateTime->getValue('minute'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Second Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('second') !== null)?$dateTime->getValue('second'):'Failed').'<br/>';
+		
+		
+		
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Year Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('Year', 1980)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Month Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('Month', 11)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Day Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('day', 30)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Hour Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('hour', 23)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Minute Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('minute', 23)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Setting Second Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($dateTime->setValue('second', 23)?'Passed':'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue():'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Base Value(Alternate Format): ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue() !== null)?$dateTime->getValue('l jS \of F, Y h:i a'):'Failed').'<br/>';
+	}else{
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;Error Creating Primitive<br/>';
+	}
 
 //Error
 
