@@ -11,22 +11,22 @@ class KernelDataPrimitiveTaskOutput extends KernelDataPrimitiveNamedList{
 		
 		//$this->data = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');	
 		
-		$this->addItem('Name', 'Output');
-		$this->addItem('Type', 'Kernel.Data.Primitive.String');
-		$this->addItem('Required', false);
-		$this->addItem('AllowList', false);
-		$this->addItem('DefaultValue', DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
+		$this->addItem('Name', 			DataClassLoader::createInstance('Kernel.Data.Primitive.List', 'Output'));
+		$this->addItem('Type', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Kernel.Data.Primitive.String'));
+		$this->addItem('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean',false));
+		$this->addItem('AllowList', 	DataClassLoader::createInstance('Kernel.DataPrimitive.Boolean', false));
+		$this->addItem('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
 	}
 	
 	public function loadData($cfg){
 		if($cfg['Name']){
 			$name = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $cfg['Name']);
-			$this->setValue('Name', $name);
+			$this->setValue('Name', 	$name);
 		}
 		
 		if($cfg['Type']){
 			$type = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $cfg['Type']);
-			$this->setValue('Type', $type);
+			$this->setValue('Type', 	$type);
 		}
 		
 		if($cfg['Required']){

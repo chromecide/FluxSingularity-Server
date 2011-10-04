@@ -112,9 +112,15 @@ class KernelDataPrimitiveDateTime extends KernelDataPrimitive{
 			case 'month':
 				return date('m', $this->data);
 				break;
+			case 'monthname':
+			case 'month name':
+				return date('F', $this->data);
+				break;
 			case 'day':
 				return date('d', $this->data);
 				break;
+			case 'dayname':
+			case 'day name':
 			case 'hour':
 				return date('H', $this->data);
 				break;

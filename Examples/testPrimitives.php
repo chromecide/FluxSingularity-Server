@@ -71,6 +71,8 @@ echo 'Testing DateTime Primitive<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('year') !== null)?$dateTime->getValue('year'):'Failed').'<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Month Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('month') !== null)?$dateTime->getValue('month'):'Failed').'<br/>';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Month NameValue: ';
+		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('month') !== null)?$dateTime->getValue('monthname'):'Failed').'<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Day Value: ';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.(($dateTime->getValue('day') !== null)?$dateTime->getValue('day'):'Failed').'<br/>';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retrieving Hour Value: ';

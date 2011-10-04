@@ -67,6 +67,7 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 		$ret = new stdClass();
 		
 		foreach($this->items as $key=>$value){
+			echo $key.'<br/>';
 			if($value instanceof KernelDataPrimitiveNamedList){
 				$ret->$key = $value->toBasicObject();
 			}elseif(in_array('KernelDataPrimitive', class_parents($value))){

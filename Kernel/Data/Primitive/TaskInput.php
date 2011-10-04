@@ -9,13 +9,11 @@ class KernelDataPrimitiveTaskInput extends KernelDataPrimitiveNamedList{
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
 		$this->_ClassVersion = '0.8.0';
 		
-		//$this->data = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');	
-		
-		$this->addItem('Name', DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Input'));
-		$this->addItem('Type', DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Kernel.Data.Primitive.String'));
-		$this->addItem('Required', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-		$this->addItem('AllowList', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-		$this->addItem('DefaultValue', DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
+		$this->addItem('Name', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	'Input'));
+		$this->addItem('Type', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	'Kernel.Data.Primitive.String'));
+		$this->addItem('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', 	false));
+		$this->addItem('AllowList', 	DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', 	false));
+		$this->addItem('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	''));
 		
 		$this->loadData($data);
 	}
