@@ -1,7 +1,7 @@
 <?php 
 class KernelDataFilesystemFile extends KernelDataEntity{
 	public function __construct($config){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Data.Filesystem.File';
 		$this->_ClassTitle='Kernel Base File Object';

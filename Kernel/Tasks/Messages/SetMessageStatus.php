@@ -1,7 +1,7 @@
 <?php
 class KernelTasksMessagesSetMessageStatus extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Messages.SetMessageStatus';
 		$this->_ClassTitle='Set Message Status';

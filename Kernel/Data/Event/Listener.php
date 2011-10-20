@@ -1,7 +1,7 @@
 <?php 
 class KernelDataEventListener extends KernelDataEntity{
 	public function __construct($config){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Data.Event.Listener';
 		$this->_ClassTitle='Event Listener';

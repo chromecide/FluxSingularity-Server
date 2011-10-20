@@ -1,7 +1,7 @@
 <?php
 class KernelTasksSecurityAddUserToCircle extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Security.AddUserToCircle';
 		$this->_ClassTitle='Add User to Circle';

@@ -1,7 +1,7 @@
 <?php
 class KernelTasksMessagesAddMessageToQueue extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Messages.AddMessageToQueue';
 		$this->_ClassTitle='Add Message To Queue';

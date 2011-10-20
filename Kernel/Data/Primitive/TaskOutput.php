@@ -11,11 +11,11 @@ class KernelDataPrimitiveTaskOutput extends KernelDataPrimitiveNamedList{
 		
 		//$this->data = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');	
 		
-		$this->addItem('Name', 			DataClassLoader::createInstance('Kernel.Data.Primitive.List', 'Output'));
-		$this->addItem('Type', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Kernel.Data.Primitive.String'));
-		$this->addItem('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean',false));
-		$this->addItem('AllowList', 	DataClassLoader::createInstance('Kernel.DataPrimitive.Boolean', false));
-		$this->addItem('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
+		//$this->setValue('Name', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Output'));
+		//$this->setValue('Type', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Kernel.Data.Primitive.String'));
+		$this->setValue('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean',false));
+		$this->setValue('AllowList', 		DataClassLoader::createInstance('Kernel.DataPrimitive.Boolean', false));
+		$this->setValue('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
 	}
 	
 	public function loadData($cfg){

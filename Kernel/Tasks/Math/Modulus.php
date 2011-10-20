@@ -1,7 +1,7 @@
 <?php
 class KernelTasksMathModulus extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Math.Modulus';
 		$this->_ClassTitle='Modulus';

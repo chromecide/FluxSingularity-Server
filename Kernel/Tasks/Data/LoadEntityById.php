@@ -1,7 +1,7 @@
 <?php 
 class KernelTasksDataLoadEntityById extends KernelTasksTask{
 	public function __construct($data){
-		parent::__construct($data);
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.LoadEntityById';
 		$this->_ClassTitle='Load Entity By ID';

@@ -6,8 +6,8 @@
  *
  */
 class KernelTasksLogicAnd extends KernelTasksTask{
-	public function __construct($inputVal1, $operator, $inputVal2){
-		parent::__construct();
+	public function __construct($data){
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Logic.And';
 		$this->_ClassTitle='Logical AND Task';
@@ -17,16 +17,17 @@ class KernelTasksLogicAnd extends KernelTasksTask{
 		
 		$this->inputs['Inputs'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input List', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>true));
 		
-		$this->outputs['Succeeded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Succeeded', 'Type'=>'Kernel.Data.Primitive.Boolean'));
-		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean'));
+		$this->outputs['Succeeded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Succeeded', 'Type'=>'Kernel.Data.Primitive.Boolean', 'AllowList'=>false));
+		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean', 'AllowList'=>false));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		
-		$inputs = $this->getTaskInput('Inputs');
+		$inputs = $this->getInputValue('Inputs');
+		
 		$inputCount = $inputs->Count();
 		
 		$succeeded = true;
@@ -43,13 +44,11 @@ class KernelTasksLogicAnd extends KernelTasksTask{
 		}
 		
 		if($succeeded){
-			//echo 'AND succeeded<br/>';
-			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
+			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
 		}else{
-			//echo 'AND failed<br/>';
-			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
 		
 		return $this->completeTask();

@@ -1,8 +1,6 @@
 <?php
-
-class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
+class ModulesWebsiteProcessesProcessSimplePage extends KernelProcessesProcess{
 	public function __construct($config){
-		
 		parent::__construct(false);
 		
 		$this->_ClassName = 'Modules.Website.Processes.SimpleWebsite';
@@ -21,52 +19,50 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 		$this->parseConfig($config);
 		
 		$this->buildTaskMap();
+		
 	}
-	
+
 	public function buildTaskMap(){
 		$process = array(
 			'Tasks'=>array(
-				'LoadWebsitePage'=>'Modules.Website.Tasks.LoadSimplePage',
-				'ProcessTemplate'=>'Modules.Website.Processes.ProcessSimplePage',	
-				/*'OutputHTML'=>'Modules.Website.Tasks.SendHTMLResponse'*/
+				/*'ProcessHeader'=>'Kernel.Tasks.Data.String.ProcessKeyValueString',
+				'ProcessFooter'=>'Kernel.Tasks.Data.String.ProcessKeyValueString',
+				'AND1'=>'Kernel.Tasks.Logic.And',
+				'JoinStrings1'=>'Kernel.tasks.Data.String.JoinStrings'*/
 			),
 			'TaskMap'=>array(
-				'Inputs'=>array(
+				/*'Inputs'=>array(
 					'Enabled'=>array(
-						'LoadWebsitePage.Enabled'
+						'ProcessHeader.Enabled',
+						'ProcessFooter.Enabled'
 					),
-					'Domain'=>array(
-						'LoadWebsitePage.Domain'
-					),
-					'PagePath'=>array(
-						'LoadWebsitePage.PagePath'
-					)
+					'Page.Header'=>array('ProcessHeader.String'),
+					'Page.Content'=>array('JoinStrings1.Strings'),
+					'Page.Footer'=>array('ProcessFooter.String')
 				),
-				'LoadWebsitePage'=>array(
-					'PageLoaded'=>array(
-						'ProcessTemplate.Enabled'
+				'ProcessHeader'=>array(
+					'StringProcessed'=>array(
+						'AND1.Inputs'
 					),
-					'WebsitePage'=>array(
-						//'ProcessTemplate.Page'
-					)
+					'String'=>'JoinStrings1.Strings'
 				),
-				'ProcessTemplate'=>array(
-					'PageProcessed'=>array(
-						'OutputHTML.Enabled'
+				'ProcessFooter'=>array(
+					'StringProcessed'=>array(
+						'AND1.Inputs'
 					),
-					'PageHTML'=>array(
-						'OutputHTML.HTMLString'
-					)
-				)/*,
-				'OutputHTML'=>array(
-					'Completed'=>array(
-						'Outputs.Completed'
+					'String'=>'JoinStrings1.Strings'
+				),
+				'AND1'=>array(
+					'Succeeded'=>array(
+						'JoinStrings1.Enabled'
 					)
 				)*/
-			)
+			),
 		);
 		
-		$this->parseDefinition($process);
+		$this->parseConfig($process);
 	}
+	
+	
 }
 ?>

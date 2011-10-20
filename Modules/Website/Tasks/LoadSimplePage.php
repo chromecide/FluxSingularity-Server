@@ -1,7 +1,7 @@
 <?php 
 class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
-	public function __construct(){
-		parent::__construct();
+	public function __construct($config){
+		parent::__construct($config);
 		
 		$this->_ClassName = 'Modules.Website.Tasks.LoadSimplePage';
 		$this->_ClassTitle='Load Simple Web Site Page';
@@ -10,22 +10,27 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 		$this->_ClassVersion = '0.7.0';
 		
 		//Inputs
-		$this->inputs['Store'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', $sourceDef);
+		$this->inputs['Store'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Store', 'Type'=>'Kernel.Data.DataStore', 'Required'=>true, 'AllowList'=>false));
 		$this->inputs['Domain'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Domain', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->inputs['PagePath'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'PagePath', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		
 		//Outputs
-		$this->outputs['PageLoaded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'PageLoaded', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>false));
+		$this->outputs['PageLoaded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'PageLoaded', 'Type'=>'Kernel.Data.Primitive.Boolean', 'AllowList'=>false));
 		$this->outputs['PageNotLoaded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'PageNotLoaded', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>false));
 		$this->outputs['WebsitePage'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'WebsitePage', 'Type'=>'Modules.Website.Data.SimplePage', 'Required'=>true, 'AllowList'=>false));
+		
 	}
 
-	public function runTask(){
+	public function run(){
+		if(!parent::run()){
+			return false;
+		}
 		$store = $this->getTaskInput('Store');
 		
 		if(!$store){
 			$store = getKernelStore();
 		}
+		
 		
 		$domain = $this->getTaskInput('Domain');
 		$pagePath = $this->getTaskInput('PagePath');
@@ -55,6 +60,7 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 		
 		$conditions = DataClassLoader::createInstance('Kernel.Data.Primitive.ConditionGroup', $params);
 		
+		
 		$retPage = $store->findOne($page, $conditions);
 		
 		if(!$retPage){
@@ -62,14 +68,14 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 			$html = DataClassLoader::createInstance('Kernel.Data.Primitive.String', '<h1>404: Page Not Found</h1>');
 			$retPage->setValue('WebsitePage', $retPage);
 			
-			$this->setTaskOutput('PageLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-			$this->setTaskOutput('PageNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('PageLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+			$this->setOutputValue('PageNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}else{
-			$this->setTaskOutput('PageLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-			$this->setTaskOutput('PageNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+			$this->setOutputValue('PageLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('PageNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 		}
 		
-		$this->setTaskOutput('WebsitePage', $retPage);
+		$this->setOutputValue('WebsitePage', $retPage);
 		
 		$this->completeTask();
 	}

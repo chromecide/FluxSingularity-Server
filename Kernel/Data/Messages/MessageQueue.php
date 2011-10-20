@@ -1,7 +1,7 @@
 <?php 
 class KernelDataMessagesMessageQueue extends KernelDataEntity{
 	public function __construct($data){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->collectionName = 'Kernel.Messaging.Queues';
 		

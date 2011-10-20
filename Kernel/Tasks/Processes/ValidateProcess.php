@@ -1,7 +1,7 @@
 <?php
 class KernelTasksProcessesValidateProcess extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Processes.ValidateProcess';
 		$this->_ClassTitle='Validate Process';

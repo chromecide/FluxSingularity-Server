@@ -1,7 +1,7 @@
 <?php
 class KernelTasksDataDeleteEntity extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.CreateEntity';
 		$this->_ClassTitle='Create an Entity Instance';

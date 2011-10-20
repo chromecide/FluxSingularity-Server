@@ -1,7 +1,7 @@
 <?php
 class KernelTasksMessagesRemoveMessageFromQueue extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Messages.RemoveMessageFromQueue';
 		$this->_ClassTitle='Remove Queue Message';

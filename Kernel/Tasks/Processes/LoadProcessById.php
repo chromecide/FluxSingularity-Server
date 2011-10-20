@@ -1,7 +1,7 @@
 <?php
 class KernelTasksProcessesLoadProcessById extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Processes.LoadProcessById';
 		$this->_ClassTitle='Load Process by ID';

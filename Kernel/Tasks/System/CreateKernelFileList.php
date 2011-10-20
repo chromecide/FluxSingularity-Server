@@ -1,7 +1,7 @@
 <?php
 class KernelTasksSystemCreateKernelFileList extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.System.CreateKernelFileList';
 		$this->_ClassTitle='Create Kernel File List';
@@ -19,14 +19,15 @@ class KernelTasksSystemCreateKernelFileList extends KernelTasksTask{
 		$this->outputs['NamedList'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'NamedList', 'Type'=>'Kernel.Data.Primitive.String'));
 	}
 
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		
+		if(!parent::run()){
 			return false;
 		}
 		
 		//Load Inputs
-		$format = $this->getTaskInput('Format');
-		$includeMeta = $this->getTaskInput('IncludeMeta');
+		$format = $this->getInputValue('Format');
+		$includeMeta = $this->getInputValue('IncludeMeta');
 		
 		//load the file list into an array
 		$fileArray = $this->kernelFilesToArray();
@@ -34,14 +35,15 @@ class KernelTasksSystemCreateKernelFileList extends KernelTasksTask{
 		switch($format->getValue()){
 			case 'HTML':
 				$return = $this->createHtml($fileArray, 0, 'Kernel', $includeMeta->getValue());
-			    $this->setTaskOutput('HTML', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $return));
+				
+			    $this->setOutputValue('HTML', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $return));
+				
 				break;
 			case 'NamedList':
 				$return = $this->createList($fileArray);
-				$this->setTaskOutput('NamedList', $return);
+				$this->setOutputValue('NamedList', $return);
 				break;
 		}
-		
 		return $this->completeTask();
 	}
 	
@@ -128,7 +130,7 @@ class KernelTasksSystemCreateKernelFileList extends KernelTasksTask{
 							$meta = $instance->getClassMeta();
 							break;
 						case 'Kernel.Kernel':
-							$item = new Kernel();
+							$item = new Kernel(false);
 							$meta = $item->getMeta();
 							break;
 						case 'Kernel.Data.Database':

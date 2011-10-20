@@ -16,6 +16,8 @@ class Kernel{
 	}
 	
 	public function __construct($config){
+		date_default_timezone_set('Australia/Melbourne');
+		 
 		DataClassLoader::loadClass('Kernel.Object');
 		
 		//Data
@@ -119,27 +121,29 @@ class Kernel{
 	}
 	
 	public function runTempProcess($processCfg){
+		//print_r($processCfg);
 		$process = DataClassLoader::createInstance('Kernel.Processes.Process', $processCfg);
-		$process->runProcess();	
+		$process->run();
+		return $process;	
 	}
 	
 	public function runProcess($processName, $inputArray=array(), $outputHTMLResults=false){
 		
 		try{
-			$process = DataClassLoader::createInstance($processName);
+			$process = DataClassLoader::createInstance($processName, $inputArray);
 		}catch (Exception $e){
 			echo 'Error Loading Class<br/><br/>';
 			$this->errors[] = $e;
 			return false;
 		}
 		
-		if($process){
+		/*if($process){
 			if($inputArray && is_array($inputArray) && count($inputArray)>0){
 				foreach($inputArray as $inputName=>$inputValue){
 					$process->setProcessInput($inputName, $inputValue);
 				}
 			}
-		}
+		}*/
 		
 		$results = $process->runProcess();
 		

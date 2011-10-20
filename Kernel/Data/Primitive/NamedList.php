@@ -17,7 +17,7 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 			if(is_array($data) || is_object($data)){
 				foreach($data as $field=>$value){
 					if(is_array($value)){
-						if($value['KernelClass']){
+						if(array_key_exists('KernelClass', $value)){
 							$this->addItem($field, DataClassLoader::createInstance($value['KernelClass'], $value));
 						}
 					}else{

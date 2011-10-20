@@ -1,7 +1,7 @@
 <?php
 class KernelDataEntityDefinition extends KernelDataEntity{
 	public function __construct($data){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Data.Entity.Definition';
 		$this->_ClassTitle='Entity Definition';
@@ -19,7 +19,7 @@ class KernelDataEntityDefinition extends KernelDataEntity{
 		
 		$this->fields['Fields'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Name', 'Type'=>'Kernel.Data.Primitive.FieldDefinition', 'Required'=>true, 'AllowList'=>true));
 		
-		$this->loadData();
+		$this->loadData($data);
 	}
 
 }

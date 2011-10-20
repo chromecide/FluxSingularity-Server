@@ -1,7 +1,7 @@
 <?php
 class KernelTasksProcessesRunProcess extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Processes.RunProcess';
 		$this->_ClassTitle = 'Run Process';

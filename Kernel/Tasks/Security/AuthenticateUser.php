@@ -1,8 +1,9 @@
 <?php
 class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 	
-	public function __construct(){
-		parent::__construct($data);
+	public function __construct($data){
+		parent::__construct(false);
+		
 		$this->_ClassName = 'Kernel.Tasks.Security.AuthenticateUser';
 		$this->_ClassTitle='Authenticate a Flux Singularity User';
 		$this->_ClassDescription = 'Authenticate a User agianst a Supplied Data Source';

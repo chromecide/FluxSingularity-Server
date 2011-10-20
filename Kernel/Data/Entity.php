@@ -44,9 +44,15 @@ class KernelDataEntity extends KernelData{
 		$this->fields['KernelModifiedBy'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedBy', 'Type'=>'Kernel.Data.Security.User', 'Required'=>false));
 		$this->fields['KernelModifiedDate'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedAt', 'Type'=>'Kernel.Data.Primitive.DateTime', 'Required'=>false));
 		
-		if($data['extends']){
+		if(is_array($data) && $data['extends']){
 			foreach($data['extends'] as $extend){
 				$this->extendClass($extend);	
+			}	
+		}else{
+			if(is_object($data) && $data->extends){
+				foreach($data->extends as $extend){
+					$this->extendClass($extend);	
+				}	
 			}	
 		}
 
@@ -57,6 +63,11 @@ class KernelDataEntity extends KernelData{
 	
 	
 	function loadData($data){
+		if(!is_array($data)){
+			//print_r($data);
+			return false;	
+		}
+		
 		if($data['KernelID']){
 			$this->setValue('KernelID', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelID']));
 		}
@@ -131,7 +142,10 @@ class KernelDataEntity extends KernelData{
 	 * Entity Getter and Setter Functions
 	 */
 	function setValue($fieldName, $value){
-		$currentValue = $data[$fieldName];
+		$currentValue = null;
+		if(array_key_exists($fieldName, $this->data)){
+			$currentValue = $this->data[$fieldName];	
+		}
 		
 		if($value!=$currentValue){
 			$this->changedFields[] = $fieldName;

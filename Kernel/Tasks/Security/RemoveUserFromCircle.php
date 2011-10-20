@@ -1,7 +1,7 @@
 <?php
 class KernelTasksSecurityRemoveUserFromCircle extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Security.RemoveUserFromCircle';
 		$this->_ClassTitle='Remove User From Circle';

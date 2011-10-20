@@ -1,7 +1,7 @@
 <?php
 class KernelTasksSystemCreateModuleFileList extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.System.CreateModuleFileList';
 		$this->_ClassTitle='Create Module File List';
@@ -19,14 +19,15 @@ class KernelTasksSystemCreateModuleFileList extends KernelTasksTask{
 		$this->outputs['NamedList'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'NamedList', 'Type'=>'Kernel.Data.Primitive.String'));
 	}
 
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		
+		if(!parent::run()){
 			return false;
 		}
 		
 		//Load Inputs
-		$format = $this->getTaskInput('Format');
-		$moduleName = $this->getTaskInput('ModuleName');
+		$format = $this->getInputValue('Format');
+		$moduleName = $this->getInputValue('ModuleName');
 		$includeMeta = $this->getTaskInput('IncludeMeta');
 		
 		//load the file list into an array
@@ -41,11 +42,11 @@ class KernelTasksSystemCreateModuleFileList extends KernelTasksTask{
 		switch($format->getValue()){
 			case 'HTML':
 				$return = $this->createHtml($fileArray, 0, $modulePath, $includeMeta->getValue());
-			    $this->setTaskOutput('HTML', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $return));
+			    $this->setOutputValue('HTML', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $return));
 				break;
 			case 'NamedList':
 				$return = $this->createList($fileArray);
-				$this->setTaskOutput('NamedList', $return);
+				$this->setOutputValue('NamedList', $return);
 				break;
 		}
 		

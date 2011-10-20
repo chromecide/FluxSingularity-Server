@@ -1,5 +1,5 @@
 ### Class Version Number Notes
-Due the intention of having a self describing system, there is some method to the madness of the way the Classes are Versioned.
+Due the intention of having a self describing system, there is some method to the madness of the way the Classes are being Versioned during the initial development.
 
 0.0.1 - Initial Constructs Created, but it's essentially a place holder  
 0.1.0 -  

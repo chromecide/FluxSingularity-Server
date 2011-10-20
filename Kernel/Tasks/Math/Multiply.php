@@ -1,7 +1,7 @@
 <?php
 class KernelTasksMathMultiply extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Math.Multiply';
 		$this->_ClassTitle='Multiply';

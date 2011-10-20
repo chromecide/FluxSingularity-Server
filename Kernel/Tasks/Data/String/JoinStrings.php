@@ -5,9 +5,9 @@
  * @author justin.pradier
  *
  */
-class KernelTasksDataJoinStrings extends KernelTasksTask{
-	public function __construct($inputVal1, $operator, $inputVal2){
-		parent::__construct();
+class KernelTasksDataStringJoinStrings extends KernelTasksTask{
+	public function __construct(){
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.JoinString';
 		$this->_ClassTitle='Join Data String';
@@ -22,15 +22,13 @@ class KernelTasksDataJoinStrings extends KernelTasksTask{
 		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean'));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
-			echo '<br/><Br/>Error<br/><Br/>';
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		
-		$inputs = $this->getTaskInput('Strings');
+		$inputs = $this->getInputValue('Strings');
 		$inputCount = $inputs->Count();
-		
 		$succeeded = true;
 		$retString = '';
 		for($i=0;$i<$inputCount;$i++){
@@ -43,15 +41,18 @@ class KernelTasksDataJoinStrings extends KernelTasksTask{
 		}
 
 		if($succeeded){
-			$this->setTaskOutput('String', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $retString));
-			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
+			$this->setOutputValue('String', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $retString));
+			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
 		}else{
-			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			
+			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
 		
 		return $this->completeTask();
 	}
+	
+	
 }
 ?>

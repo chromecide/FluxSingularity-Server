@@ -106,7 +106,7 @@ class DataClassLoader{
 			
 			return $item;
 		}else{
-			throw new Exception("Could not create class: $className", 1);
+			throw new Exception("Could not create class: ($className)", 1);
 			//return 'could not find class';
 		}
 	}

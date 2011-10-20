@@ -6,8 +6,8 @@
  *
  */
 class KernelTasksLogicIf extends KernelTasksTask{
-	public function __construct($inputVal1, $operator, $inputVal2){
-		parent::__construct();
+	public function __construct($data){
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Logic.If';
 		$this->_ClassTitle='Logical IF Task';

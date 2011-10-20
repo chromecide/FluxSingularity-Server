@@ -1,7 +1,7 @@
 <?php
 class KernelDataPrimitiveError extends KernelDataPrimitiveNamedList{
 	public function __construct($data){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Data.Primitive.Error';
 		$this->_ClassTitle='Error Primitive Object';

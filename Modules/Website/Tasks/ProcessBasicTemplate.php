@@ -1,37 +1,16 @@
-<?php 
-class ModulesWebsiteTasksProcessBasicTemplate extends KernelTasksTask{
+<?php
+//this is a glorified wrapper for Kernel.Tasks.Data.String.ProcessKeyValueString
+// simply because i think people will expect a task like this to exist within the website module
+//even though it does exactly the same thing as it's parent class. Cheers. 
+class ModulesWebsiteTasksProcessBasicTemplate extends KernelTasksDataStringProcessKeyValueString{
 	public function __construct(){
 		parent::__construct();
-		$this->kernelClass='Modules.Website.Tasks.ProcessBasicTemplate';
-		$this->title='Process Basic Template';
-		$this->description='Process a Basic Key-Value Template';
-		$this->author='Justin Pradier <justin.pradier@fluxsingularity.com>';
-
-		//Inputs
-
-		$this->inputs['Template'] = array('Template', 'Modules.Website.Data.BasicTemplate', true);
-		$this->inputs['Values'] = array('Values', 'Kernel.Data.Primitive.NamedList', true);
-		//Outputs
-
-		$this->outputs['ProcesseHTML'] = array('ProcesseHTML', 'Kernel.Data.Primitive.String');
-	}
-
-	public function runTask(){
-		//Defaults
-
-		//Load Inputs
-		$Template = $this->getTaskInput('Template');
-		$Values = $this->getTaskInput('Values');
-
-		$values = $Values->toBasicObject();
 		
-		$processedHTML = $Template;
-		foreach($values as $key=>$value){
-			preg_replace('/{'.$key.'}/', $value, $processedHTML);
-		}
-		
-		$this->setTaskOutput('ProcessedHTML', $processedHTML);
-		parent::runTask();
+		$this->_ClassName = 'Modules.Website.Tasks.ProcessBasicTemplate';
+		$this->_ClassTitle='Website - Process Basic Template';
+		$this->_ClassDescription = 'Processes a HTML String with basic templates using key/value pairs.  Templates are in the format of "{item Name}"';
+		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
+		$this->_ClassVersion = '1.0.0';
 	}
 }
 ?>
