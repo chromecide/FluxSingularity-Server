@@ -295,9 +295,7 @@ class KernelProcessesProcess extends KernelObject{
 	}	
 
 	public function setTokenData($task, $param, $data){
-		if($param=='PageHTML'){
-			die('fucker');
-		}
+		
 		$taskObj = $this->tasks[$task];
 		if(!$taskObj){
 			echo 'task not loaded';
@@ -314,13 +312,17 @@ class KernelProcessesProcess extends KernelObject{
 			echo $task.':'.$param.'<br/>';
 		}else{
 			if($field->getValue('AllowList')){
+				
 				if($field->getValue('AllowList')->getValue()==true){
+					
 					$newData = false;
 					if(array_key_exists($param, $this->tokens[$task])){
+						
 						$newData =$this->tokens[$task][$param];
 					}
 					
 					if(!($newData instanceof KernelDataPrimitiveList)){
+						
 						$newData = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
 					}
 					$newData->addItem($data);
@@ -363,14 +365,14 @@ class KernelProcessesProcess extends KernelObject{
 				$this->trace[] = '          -'.$taskName;
 				foreach($taskMappings as $attributeMap){
 					foreach($attributeMap as $sourceString=>$targetString){
-						$this->trace[] = '               -'.$sourceString;
+						$this->trace[] = '               -'.$sourceString.'=>'.$targetString;
 						
 						switch($taskName){
 							case 'Inputs':
 								$targetValue = $this->getInputValue($sourceString);
 								break;
 							case 'LocalData':
-								$targetValue = getLocalDataValue($sourceString);
+								$targetValue = $this->getLocalData($sourceString);
 								break;
 							default:
 								
@@ -479,13 +481,18 @@ class KernelProcessesProcess extends KernelObject{
 			$this->trace[] = 'Preparing Task: '.$taskName;
 			$this->runPreProcessor($taskName);
 			$this->processTokens();
-			
+			if($taskName=='OR1'){
+				//print_r($this->tokens);
+			}
 			if($task->isReady()){
 				try{
 					$task->run();
 					$tasksRun++;
 					
 					$completed = $task->getOutputValue('Completed');
+					if(!$completed){
+						echo $taskName.'<br/>';
+					}
 					if($completed->getValue()){
 						$this->completedTasks[$taskName] = true;
 						$this->trace[] = 'Task Completed - '.$taskName;
@@ -509,7 +516,13 @@ class KernelProcessesProcess extends KernelObject{
 		}
 		if($tasksRun>0){
 			$this->trace[] = 'Processed Tasks: '.$tasksRun.'/'.count($this->tasks).'('.count($this->completedTasks).' Completed)';
-			$this->processTasks();
+			if(count($this->tasks)==count($this->completedTasks)){
+				$this->trace[] = 'Process Complete';
+			
+				$this->setProcessOutput('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			}else{
+				$this->processTasks();	
+			}
 		}else{
 			$this->trace[] = 'Process Complete';
 			
@@ -595,7 +608,7 @@ class KernelProcessesProcess extends KernelObject{
 				}
 			}
 		}else{
-			echo $this->getClassName().' not enabled<br/>';
+		//	echo $this->getClassName().' not enabled<br/>';
 		}
 		
 		return false;

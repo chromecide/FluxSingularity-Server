@@ -14,6 +14,7 @@ class ModulesWebsiteTasksSendHTMLResponse extends KernelTasksTask{
 	}
 	
 	public function run(){
+		
 		if(!parent::run()){
 			return false;
 		}

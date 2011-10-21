@@ -7,7 +7,7 @@
  */
 class KernelTasksLogicIf extends KernelTasksTask{
 	public function __construct($data){
-		parent::__construct(false);
+		parent::__construct($data);
 		
 		$this->_ClassName = 'Kernel.Tasks.Logic.If';
 		$this->_ClassTitle='Logical IF Task';
@@ -23,17 +23,24 @@ class KernelTasksLogicIf extends KernelTasksTask{
 		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean'));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		
+		if(!parent::run()){
 			return false;
 		}
 		
-		$input1Obj = $this->getTaskInput('Input1');
-		$input2Obj = $this->getTaskInput('Input2');
-		$operatorObj = $this->getTaskInput('Operator');
+		$input1Obj = $this->getInputValue('Input1');
+		$input2Obj = $this->getInputValue('Input2');
+		$operatorObj = $this->getInputValue('Operator');
 		
 		$input1 = $input1Obj->getValue();
-		$operator = $operatorObj->getValue();
+		
+		$operator = '==';
+
+		if($operatorObj){
+			$operator = $operatorObj->getValue();	
+		}
+		
 		$input2 = $input2Obj->getValue();
 		
 		$result = false;
@@ -41,9 +48,6 @@ class KernelTasksLogicIf extends KernelTasksTask{
 		switch($operator){
 			case "!=":
 				$result = $input1!=$input2;
-				break;
-			case '==':
-				$result = $input1==$input2;
 				break;
 			case '>=':
 				$result = $input1>=$input2;
@@ -59,9 +63,13 @@ class KernelTasksLogicIf extends KernelTasksTask{
 				break;
 			case '@':
 				$result = false;
+				break;	
+			case '==':
+			default:
+				$result = $input1==$input2;
 				break;
 		}
-		
+
 		$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $result));
 		$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', !$result));
 		

@@ -22,17 +22,28 @@ class KernelTasksLogicOr extends KernelTasksTask{
 		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean'));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		
 		$inputs = $this->getTaskInput('Inputs');
-		$inputCount = $inputs->Count();
-		$succeeded = false;
 		
+		if($inputs instanceof KernelDataPrimitiveList){
+			$inputCount = $inputs->Count();	
+		}else{
+			if($inputs instanceof KernelDataPrimitiveBoolean){
+				$inputCount=1;
+				$inputItem = $inputs;
+				$inputs = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+				$inputs->addItem($inputItem);
+			}
+		}
+		
+		$succeeded = false;
+
 		for($i=0;$i<$inputCount;$i++){
-			$item = $inputs->getItem($i+1);
+			$item = $inputs->getItem($i);
 			if($item){
 				if($item->getValue()===true){
 					$succeeded = true;
@@ -44,10 +55,11 @@ class KernelTasksLogicOr extends KernelTasksTask{
 			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
 		}else{
+			echo 'or failed';
 			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
-		
+
 		return $this->completeTask();
 	}
 }

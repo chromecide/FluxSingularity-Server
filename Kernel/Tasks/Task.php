@@ -96,7 +96,7 @@ class KernelTasksTask extends KernelObject{
 				}
 			}
 		}else{
-			echo $this->getClassName().' not enabled<br/>';
+			//echo $this->getClassName().' not enabled<br/>';
 		}	
 		
 		

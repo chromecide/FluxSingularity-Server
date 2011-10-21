@@ -25,34 +25,78 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 	
 	public function buildTaskMap(){
 		$process = array(
+			'LocalData'=>array(
+					'ADMIN_URL'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', '/admin'),
+					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN')
+			),
 			'Tasks'=>array(
+				'IF1'=>'Kernel.Tasks.Logic.If',
 				'LoadWebsitePage'=>'Modules.Website.Tasks.LoadSimplePage',
-				'ProcessTemplate'=>'Modules.Website.Tasks.ProcessBasicTemplate',	
+				'OR1'=>'Kernel.Tasks.Logic.Or',
+				'ProcessTemplate'=>'Modules.Website.Tasks.ProcessBasicTemplate',
+				'OR2'=>'Kernel.Tasks.Logic.Or',
 				'OutputHTML'=>'Modules.Website.Tasks.SendHTMLResponse'
 			),
 			'TaskMap'=>array(
+				'LocalData'=>array(
+					'ADMIN_URL'=>array(
+						'IF1.Input1'
+					),
+					'ADMIN_MESSAGE'=>array(
+						'OutputHTML.HTMLString'
+					)
+				),
 				'Inputs'=>array(
 					'Enabled'=>array(
-						'LoadWebsitePage.Enabled'
+						'IF1.Enabled'
 					),
 					'Domain'=>array(
 						'LoadWebsitePage.Domain'
 					),
 					'PagePath'=>array(
+						'IF1.Input2',
 						'LoadWebsitePage.PagePath'
 					)
 				),
+				'IF1'=>array(
+					'Completed'=>array(
+						'OR2.Enabled'
+					),
+					'Failed'=>array(
+						'LoadWebsitePage.Enabled'
+					),
+					'Succeeded'=>array(
+						'OR2.Inputs',
+						
+					)
+				),
 				'LoadWebsitePage'=>array(
+					'Completed'=>array(
+						'OR1.Enabled'
+					),
 					'PageLoaded'=>array(
-						'ProcessTemplate.Enabled'
+						'OR1.Inputs'
+					),
+					'PageNotLoaded'=>array(
+						'OR1.Inputs'
 					),
 					'WebsitePage'=>array(
 						'ProcessTemplate.Page'
 					)
 				),
+				'OR1'=>array(
+					'Succeeded'=>array(
+						'ProcessTemplate.Enabled'
+					)
+				),
+				'OR2'=>array(
+					'Succeeded'=>array(
+						'OutputHTML.Enabled'
+					)
+				),
 				'ProcessTemplate'=>array(
 					'PageProcessed'=>array(
-						'OutputHTML.Enabled'
+						'OR2.Inputs'
 					),
 					'HTML'=>array(
 						'OutputHTML.HTMLString'

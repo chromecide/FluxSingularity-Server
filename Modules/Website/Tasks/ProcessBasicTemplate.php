@@ -28,20 +28,34 @@ class ModulesWebsiteTasksProcessBasicTemplate extends KernelTasksTask{
 		$page = $this->getInputValue('Page');
 		
 		$title = $page->getValue('Title');
-		$header = $page->getValue('Header')->getValue('HTML');
-		
-		$footer = $page->getValue('Footer')->getValue('HTML');
+		$header = $page->getValue('Header');
+		$footer = $page->getValue('Footer');
 		$content = $page->getValue('Content');
 		
-		$titleString = $title->getValue();
-		$headerString = $header->getValue();
+		$titleString = 'Error';
+		$headerString = '';
+		$contentString = '';
+		$footerString = '';
 		
-		$headerString = str_replace('{Title}', $titleString, $headerString);
+		if($title){
+			$titleString = $title->getValue();	
+		}
 		
-		$footerString = $footer->getValue();
+		if($header){
+			$header = $header->getValue('HTML');
+			$headerString = $header->getValue();
+			$headerString = str_replace('{Title}', $titleString, $headerString);	
+		}
 		
-		$contentString = $content->getValue();
+		if($footer){
+			$footer = $footer->getValue('HTML');
+			$footerString = $footer->getValue();
+		}
 		
+		if($content){
+			$contentString = $content->getValue();	
+		}
+			
 		$htmlString = $headerString;
 		$htmlString.=$contentString;
 		$htmlString.=$footerString;
