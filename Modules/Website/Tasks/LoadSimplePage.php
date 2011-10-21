@@ -25,12 +25,12 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 		if(!parent::run()){
 			return false;
 		}
-		$store = $this->getTaskInput('Store');
 		
+		//$store = $this->getInputValue('Store');
+		$store = false;
 		if(!$store){
-			$store = getKernelStore();
+			$store = $this->getKernelStore();
 		}
-		
 		
 		$domain = $this->getTaskInput('Domain');
 		$pagePath = $this->getTaskInput('PagePath');
@@ -59,7 +59,6 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 		$page = DataClassLoader::createInstance('Modules.Website.Data.SimplePage');
 		
 		$conditions = DataClassLoader::createInstance('Kernel.Data.Primitive.ConditionGroup', $params);
-		
 		
 		$retPage = $store->findOne($page, $conditions);
 		

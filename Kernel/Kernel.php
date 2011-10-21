@@ -59,12 +59,13 @@ class Kernel{
 	}
 	
 	public function parseConfig($config){
-		if($config['KernelStore']){
+		if(array_key_exists('KernelStore', $config)){
 			$this->loadKernelStore($config['KernelStore']);
 			KernelDataEntity::$kernelStore = $this->getKernelStore();
+			KernelTasksTask::$kernelStore = $this->getKernelStore();
 		}
 
-		if($config['User']){
+		if(array_key_exists('User', $config)){
 			$this->loadUser($config['User']);
 		}
 	}

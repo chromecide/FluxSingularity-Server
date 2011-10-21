@@ -24,13 +24,12 @@ class KernelProcessesProcess extends KernelObject{
 	
 	public function __construct($config){
 		
-		parent::__construct($config);
-		
 		$this->_ClassName = 'Kernel.Processes.Process';
 		$this->_ClassTitle='Base Process Object';
 		$this->_ClassDescription = 'The basis for all Processes within the Flux Singularity platform';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.4.0';
+		
 		
 		$this->inputs['Enabled'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Enabled', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>false, 'AllowList'=>false));
 		$this->inputs['Reset'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Reset', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'DefaultValue'=>false, 'AllowList'=>false));
@@ -296,7 +295,9 @@ class KernelProcessesProcess extends KernelObject{
 	}	
 
 	public function setTokenData($task, $param, $data){
-		
+		if($param=='PageHTML'){
+			die('fucker');
+		}
 		$taskObj = $this->tasks[$task];
 		if(!$taskObj){
 			echo 'task not loaded';

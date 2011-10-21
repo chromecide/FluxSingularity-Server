@@ -7,11 +7,14 @@
  *
  */
 class KernelTasksTask extends KernelObject{
+	public static $kernelStore = null;
+	
 	protected $inputs = array();
 	protected $outputs = array();
 	
 	protected $inputData = array();
 	protected $outputData = array();
+	
 	
 	public function __construct($data){
 		parent::__construct($data);
@@ -261,6 +264,10 @@ class KernelTasksTask extends KernelObject{
 		}
 	}
 	
+	public function getKernelStore(){
+		return self::$kernelStore;
+	}
+	
 	public function setTaskInput($input, $value){
 		$field = $this->inputs[$input];
 		
@@ -327,14 +334,15 @@ class KernelTasksTask extends KernelObject{
 			$canBeList = $canBeListObj->getValue();
 			
 			if($defaultValue){
-				$defaultValue = $defaultValue->getValue();
+				$defaultValue = $defaultValue;
 			}else{
 				$defaultValue=null;
 			}
 			
-			$inputValue = $this->getTaskInput($inputName);
+			$inputValue = $this->getInputValue($inputName);
 			
 			if($inputValue){
+				
 				if($canBeList){
 					if($inputValue instanceof KernelDataPrimitiveList){
 						
@@ -347,7 +355,7 @@ class KernelTasksTask extends KernelObject{
 						$typeFound = false;
 						
 						foreach($classNames as $className){
-							$tObject = new $className();
+							$tObject = new $className(array());
 							if($tObject){
 								if($tObject->getClassName()==$type){
 									$typeFound = true;
@@ -365,7 +373,12 @@ class KernelTasksTask extends KernelObject{
 			}else{
 				if($required){
 					if($defaultValue!==null){
-						$this->setTaskInput($inputName, DataClassLoader::createInstance($type, $defaultValue));
+						if($defaultValue instanceof $type){
+							$this->setInputValue($inputName, $defaultValue);
+						}else{
+							$this->setInputValue($inputName, DataClassLoader::createInstance($type, $defaultValue));	
+						}
+						
 					}else{
 						$this->addError($this->getClassName(), $inputName.' is a required Input');
 					}

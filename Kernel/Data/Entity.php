@@ -44,7 +44,7 @@ class KernelDataEntity extends KernelData{
 		$this->fields['KernelModifiedBy'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedBy', 'Type'=>'Kernel.Data.Security.User', 'Required'=>false));
 		$this->fields['KernelModifiedDate'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedAt', 'Type'=>'Kernel.Data.Primitive.DateTime', 'Required'=>false));
 		
-		if(is_array($data) && $data['extends']){
+		if(is_array($data) && array_key_exists('extends', $data)){
 			foreach($data['extends'] as $extend){
 				$this->extendClass($extend);	
 			}	
@@ -68,36 +68,37 @@ class KernelDataEntity extends KernelData{
 			return false;	
 		}
 		
-		if($data['KernelID']){
+		if(array_key_exists('KernelID', $data)){
 			$this->setValue('KernelID', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelID']));
 		}
 
-		if($data['KernelClass']){
+		if(array_key_exists('KernelClass', $data)){
 			$this->setValue('KernelClass', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelClass']));
 		}else{
 			$this->setValue('KernelClass', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $this->getClassName()));
 		}
 
-		if($data['KernelName']){
+		if(array_key_exists('KernelName', $data)){
 			$this->setValue('KernelName', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelName']));
 		}
 
-		if($data['KernelDescription']){
+		if(array_key_exists('KernelDescription', $data)){
 			$this->setValue('KernelDescription', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelDescription']));
 		}
 
-		if($data['KernelRevision']){
+		if(array_key_exists('KernelRevision', $data)){
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelRevision']));
 		}
 		
-		if($data['Store']){
+		if(array_key_exists('Store', $data)){
 			$this->store = $data['Store'];
 		}
 
 		$fields = $this->getFields();
 		
 		foreach($fields as $fieldName=>$fieldCfg){
-			if($data[$fieldName]){
+			
+			if(array_key_exists($fieldName, $data)){
 				if($fieldCfg instanceof KernelDataPrimitiveFieldDefinition){
 					$type = $fieldCfg->getValue('Type')->getValue();
 					$allowList = $fieldCfg->getValue('AllowList')->getValue();
@@ -112,6 +113,7 @@ class KernelDataEntity extends KernelData{
 								
 							}
 						}else{
+							
 							$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));	
 						}
 					}
@@ -157,12 +159,16 @@ class KernelDataEntity extends KernelData{
 		if($fieldName===null){
 			return $this->toBasicObject();
 		}else{
-			$value = $this->data[$fieldName];
-			if(in_array('KernelData', class_parents($value))){
-				$retValue = $value;
+			if(array_key_exists($fieldName, $this->data)){
+				$value = $this->data[$fieldName];	
+				if(in_array('KernelData', class_parents($value))){
+					$retValue = $value;
+				}else{
+					$retValue = $defaultValue;
+				}	
 			}else{
-				$retValue = $defaultValue;
-			}	
+				return null;
+			}
 		}
 		
 		

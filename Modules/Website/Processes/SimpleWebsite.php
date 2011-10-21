@@ -27,8 +27,8 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 		$process = array(
 			'Tasks'=>array(
 				'LoadWebsitePage'=>'Modules.Website.Tasks.LoadSimplePage',
-				'ProcessTemplate'=>'Modules.Website.Processes.ProcessSimplePage',	
-				/*'OutputHTML'=>'Modules.Website.Tasks.SendHTMLResponse'*/
+				'ProcessTemplate'=>'Modules.Website.Tasks.ProcessBasicTemplate',	
+				'OutputHTML'=>'Modules.Website.Tasks.SendHTMLResponse'
 			),
 			'TaskMap'=>array(
 				'Inputs'=>array(
@@ -47,22 +47,22 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 						'ProcessTemplate.Enabled'
 					),
 					'WebsitePage'=>array(
-						//'ProcessTemplate.Page'
+						'ProcessTemplate.Page'
 					)
 				),
 				'ProcessTemplate'=>array(
 					'PageProcessed'=>array(
 						'OutputHTML.Enabled'
 					),
-					'PageHTML'=>array(
+					'HTML'=>array(
 						'OutputHTML.HTMLString'
 					)
-				)/*,
+				),
 				'OutputHTML'=>array(
 					'Completed'=>array(
-						'Outputs.Completed'
+						//'Outputs.Completed'
 					)
-				)*/
+				)
 			)
 		);
 		

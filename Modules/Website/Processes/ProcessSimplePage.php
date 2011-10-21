@@ -1,13 +1,19 @@
 <?php
 class ModulesWebsiteProcessesProcessSimplePage extends KernelProcessesProcess{
 	public function __construct($config){
-		parent::__construct(false);
+		//parent::__construct($config);
 		
 		$this->_ClassName = 'Modules.Website.Processes.SimpleWebsite';
 		$this->_ClassTitle='Simple Website Process';
 		$this->_ClassDescription = 'This process handles requests for Simple website pages';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '1.0.0';
+		
+		//$this->inputs['Enabled'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Enabled', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>false, 'AllowList'=>false));
+		$this->inputs['Reset'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Reset', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true,'AllowList'=>false));
+		
+		$this->outputs['Errors'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Errors', 'Type'=>'Kernel.Data.Primitive.Error', 'AllowList'=>true));
+		$this->outputs['Completed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Completed', 'Type'=>'Kernel.Data.Primitive.Boolean', 'AllowList'=>false));
 		
 		//Inputs
 		$this->inputs['Domain'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Domain', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
