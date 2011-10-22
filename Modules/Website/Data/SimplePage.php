@@ -20,8 +20,6 @@ class ModulesWebsiteDataSimplePage extends KernelDataEntity{
 		
 		//$this->fields['PageHTML'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Page HTML', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>false, 'AllowList'=>false));
 		
-		//echo 'setting data<br/>';
-		//print_r($data);
 		$this->loadData($data);
 	}
 }
