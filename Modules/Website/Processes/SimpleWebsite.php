@@ -1,5 +1,4 @@
 <?php
-
 class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 	public function __construct($config){
 		
@@ -27,7 +26,7 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 		$process = array(
 			'LocalData'=>array(
 					'ADMIN_URL'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', '/admin'),
-					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN')
+					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN BEEOTCH')
 			),
 			'Tasks'=>array(
 				'IF1'=>'Kernel.Tasks.Logic.If',

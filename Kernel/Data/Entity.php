@@ -64,8 +64,7 @@ class KernelDataEntity extends KernelData{
 	
 	function loadData($data){
 		if(!is_array($data)){
-			//print_r($data);
-			return false;	
+			$data = array();	
 		}
 		
 		if(array_key_exists('KernelID', $data)){
@@ -288,14 +287,17 @@ class KernelDataEntity extends KernelData{
 		}
 		
 		$kernelVersion = $this->getValue('KernelVersion');
+		
 		if($kernelVersion){
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $this->incrementRevision($kernelVersion->getValue())));
 		}else{
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', '1.0.0'));
 		}
+		
 		$return = $this->store->save($this);
 		
 		$this->afterSave();
+		
 		return $return;
 	}
 	
@@ -324,9 +326,9 @@ class KernelDataEntity extends KernelData{
 			$kernelID = $this->getValue('KernelID');
 			
 		}
-		echo $this->collectionName.'<br/>';
+		//echo $this->collectionName.'<br/>';
 		$ref =  $this->store->getEntityReference($this);
-		echo 'here';
+		//echo 'here';
 		return $ref;
 	}
 	
