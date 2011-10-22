@@ -32,8 +32,8 @@ class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 		
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		

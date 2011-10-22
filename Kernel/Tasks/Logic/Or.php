@@ -13,7 +13,7 @@ class KernelTasksLogicOr extends KernelTasksTask{
 		$this->_ClassTitle='Logical OR Task';
 		$this->_ClassDescription = 'Succeeds if any of the Inputs are true';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.5.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		
 		$this->inputs['Inputs'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input List', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>true));

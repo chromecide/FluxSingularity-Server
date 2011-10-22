@@ -10,8 +10,8 @@ class KernelTasksSecuritySetEntityPermissions extends KernelTasksTask{
 		$this->_ClassVersion = '0.0.1';
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		

@@ -21,7 +21,7 @@ class KernelTasksProcessesConvertProcessToJSON extends KernelTasksTask{
 		
 	}
 	
-	public function runTask(){
+	public function run(){
 		$p = $this->getTaskInput('Process');
 		
 		if(!in_array('KernelProcessesProcess', class_parents($p))){
