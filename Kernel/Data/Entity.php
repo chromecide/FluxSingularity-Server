@@ -346,6 +346,7 @@ class KernelDataEntity extends KernelData{
 	function toBasicObject(){
 		$ret = new stdClass();
 		$ret->KernelClass = $this->getClassName();
+		
 		foreach($this->fields as $field=>$fieldDef){
 			$type = $fieldDef->getItem('Type')->getValue();
 			$required = $fieldDef->getItem('Required')->getValue();
@@ -359,8 +360,6 @@ class KernelDataEntity extends KernelData{
 			if($valueObj){
 				switch($fieldType){
 					case 'Kernel.Data.Primitive.List':
-						$value = $valueObj->toJSON();
-						break;
 					case 'Kernel.Data.Primitive.NamedList':
 						$value = $valueObj->toBasicObject();
 						break;
@@ -368,11 +367,17 @@ class KernelDataEntity extends KernelData{
 						$parentClasses = class_parents($valueObj);
 						//if it's a primitive type, just call the get function
 						if(in_array('KernelDataPrimitive', $parentClasses)){
-							$value = $valueObj->getValue();
+							if($valueObj instanceof KernelDataPrimitiveList){
+								$value = $valueObj->toBasicObject();
+							}else{
+								$value = $valueObj->getValue();	
+							}
 						}else{
+							
 							//if it's an entity type call it's corresponding toJSON function
 							if(in_array('KernelDataEntity', $parentClasses)){
-								$value = $valueObj->toJSON();
+								
+								$value = $valueObj->toBasicObject();
 							}
 						}
 						
@@ -475,7 +480,7 @@ class KernelDataEntity extends KernelData{
 							}else{
 								//list is the right type
 								//if required, ensure the list has at least 1 item
-								if($required && $fieldValue->Count()>0){
+								if($required && $fieldValue->Count()<1){
 									$this->validationErrors[] = array('InvalidValue', $field.' expects at least one list item');
 									$valid = false;
 								}

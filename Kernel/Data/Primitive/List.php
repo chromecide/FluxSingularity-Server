@@ -40,7 +40,7 @@ class KernelDataPrimitiveList extends KernelDataPrimitive{
 		return $this->items[$index];
 	}
 	
-	public function getValue($field){
+	public function getValue($field=null){
 		if($field=='count'){
 			return $this->Count();
 		}else{
@@ -48,18 +48,24 @@ class KernelDataPrimitiveList extends KernelDataPrimitive{
 		}
 	}
 	
-	public function toJSON(){
-		$jsonObj = array();
+	public function toBasicObject(){
+		$basicObj = array();
+		
 		foreach($this->items as $item){
 			if($item instanceof KernelDataPrimitiveNamedList){
-				$jsonObj[] = $item->toBasicObject();
+				$basicObj[] = $item->toBasicObject();
 			}elseif(in_array('KernelDataPrimitive', class_parents($item))){
-				$jsonObj[] = $item->getValue();
+				$basicObj[] = $item->getValue();
 			}elseif(in_array('KernelDataEntity', class_parents($item))){
-				$jsonObj[] = $item->toBasicObject();
+				$basicObj[] = $item->toBasicObject();
 			}else{
 			}
 		}
+		return $basicObj;
+	}
+	
+	public function toJSON(){
+		$jsonObj  = $this->toBasicObject();
 		return json_encode($jsonObj);
 	}
 }
