@@ -23,7 +23,7 @@ class ModulesWebsiteTasksLoadPOSTData extends KernelTasksTask{
 		$list = DataClassLoader::createInstance('Kernel.Data.Primitive.NamedList');
 		
 		foreach($_POST as $key=>$value){
-			$list->addItem($key, DataClassLoader::createInstance('Kernel.Data.Primitive.String', $value));
+			$list->setValue($key, DataClassLoader::createInstance('Kernel.Data.Primitive.String', $value));
 		}
 		
 		$this->setTaskOutput('Count', count($_POST));
