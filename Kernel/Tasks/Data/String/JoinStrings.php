@@ -13,9 +13,9 @@ class KernelTasksDataStringJoinStrings extends KernelTasksTask{
 		$this->_ClassTitle='Join Data String';
 		$this->_ClassDescription = 'Joins Multiple Data Strings';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.9.9';
+		$this->_ClassVersion = '1.0.0';
 		
-		$this->inputs['Strings'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Strings', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>true));
+		$this->inputs['Strings'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Strings', 'Type'=>'Kernel.Data.Primitive', 'Required'=>true, 'AllowList'=>true));
 		
 		$this->outputs['String'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'String', 'Type'=>'Kernel.Data.Primitive.String'));
 		$this->outputs['Succeeded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Succeeded', 'Type'=>'Kernel.Data.Primitive.Boolean'));
@@ -28,28 +28,35 @@ class KernelTasksDataStringJoinStrings extends KernelTasksTask{
 		}
 		
 		$inputs = $this->getInputValue('Strings');
-		$inputCount = $inputs->Count();
-		$succeeded = true;
-		$retString = '';
-		for($i=0;$i<$inputCount;$i++){
-			$item = $inputs->getItem($i);
-			if($item){
-				$retString.=$item->getValue();
-			}else{
-				$succeeded = false;
-			}
-		}
-
-		if($succeeded){
-			$this->setOutputValue('String', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $retString));
-			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
-		}else{
-			
-			$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-			$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-		}
 		
+		if($inputs instanceof KernelDataPrimitiveList){
+			$inputCount = $inputs->Count();
+			$succeeded = true;
+			$retString = '';
+			
+			for($i=0;$i<$inputCount;$i++){
+				$item = $inputs->getItem($i);
+				if($item){
+					$retString.=$item->getValue();
+				}else{
+					$succeeded = false;
+				}
+			}
+			
+			//echo 'Joined: '.$retString.'<br/>';
+			
+			if($succeeded){
+				$this->setOutputValue('String', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $retString));
+				$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+				$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
+			}else{
+				
+				$this->setOutputValue('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+				$this->setOutputValue('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			}	
+		}else{
+			return false;
+		}
 		return $this->completeTask();
 	}
 	

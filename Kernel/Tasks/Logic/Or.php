@@ -28,7 +28,7 @@ class KernelTasksLogicOr extends KernelTasksTask{
 		}
 		
 		$inputs = $this->getTaskInput('Inputs');
-		
+		$inputCount=-1;
 		if($inputs instanceof KernelDataPrimitiveList){
 			$inputCount = $inputs->Count();	
 		}else{
@@ -55,7 +55,6 @@ class KernelTasksLogicOr extends KernelTasksTask{
 			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));	
 		}else{
-			echo 'or failed';
 			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}

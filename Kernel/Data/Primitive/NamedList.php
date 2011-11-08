@@ -60,7 +60,12 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 	}
 	
 	public function getItem($name){
-		return $this->items[$name];
+		if(array_key_exists($name, $this->items)){
+			return $this->items[$name];	
+		}else{
+			return null;
+		}
+		
 	}
 	
 	public function toBasicObject(){

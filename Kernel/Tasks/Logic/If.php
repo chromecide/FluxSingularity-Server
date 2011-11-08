@@ -69,7 +69,7 @@ class KernelTasksLogicIf extends KernelTasksTask{
 				$result = $input1==$input2;
 				break;
 		}
-
+		
 		$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $result));
 		$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', !$result));
 		

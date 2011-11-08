@@ -1,0 +1,10 @@
+.FSManagerNode{
+	background-color: #cccccc;	
+}
+
+.FSManagerNodeInput{
+	background-color: #0000FF;
+	float:left;
+	width: 15px;
+	margin-right: 2px;
+}

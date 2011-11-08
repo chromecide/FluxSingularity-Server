@@ -13,10 +13,6 @@ $FSKernel = DataClassLoader::createInstance('Kernel');
 
 $process = array(
 	'Definition'=>array(
-		'Defaults'=>array(
-			'Create Kernel File List.Format'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'HTML'),
-			'Create Module File List.Format'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'HTML'),
-		),
 		'LocalData'=>array(
 			'LoopCount'=>DataClassLoader::createInstance('Kernel.Data.Primitive.Number', 0)
 		),
@@ -83,7 +79,7 @@ $process = array(
 		)
 	),
 	'Inputs'=>array(
-		//'Format'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'HTML'),
+		'Format'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'HTML'),
 		'IncludeMeta'=>DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true),
 		'Enabled'=>DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true)
 	)

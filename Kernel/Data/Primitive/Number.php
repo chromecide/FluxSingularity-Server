@@ -11,14 +11,15 @@ class KernelDataPrimitiveNumber extends KernelDataPrimitive{
 		
 		$this->data=0;
 		
-		if($data){
+		//if($data!=null){
 			if(is_numeric($data)){
 				$this->data = $data;
 			}
-		}
+		//}
 	}
 	
 	public function setValue($value){
+		echo 'setting value<br/>';
 		if(is_numeric($value)){
 			$this->data = $value;
 			return true;

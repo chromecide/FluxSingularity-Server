@@ -22,6 +22,7 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 	}
 
 	public function run(){
+		
 		if(!parent::run()){
 			return false;
 		}
@@ -67,7 +68,6 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 			$html = DataClassLoader::createInstance('Kernel.Data.Primitive.String', '<h1>404: Page Not Found</h1>');
 			$retPage->setValue('Content', $html);
 			
-			
 			$this->setOutputValue('PageLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 			$this->setOutputValue('PageNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}else{
@@ -77,8 +77,7 @@ class ModulesWebsiteTasksLoadSimplePage extends KernelTasksTask{
 		
 		$this->setOutputValue('WebsitePage', $retPage);
 		
-		$this->completeTask();
-		
+		return $this->completeTask();
 	}
 }
 ?>

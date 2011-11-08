@@ -16,9 +16,12 @@ class KernelTasksMathAdd extends KernelTasksTask{
 		
 		//Outputs
 		$this->outputs['Result'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Result', 'Type'=>'Kernel.Data.Primitive.Number'));
+		
+		$this->outputs['Succeeded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Succeeded', 'Type'=>'Kernel.Data.Primitive.Boolean'));
 	}
 
 	public function run(){
+		$succeeded = true;
 		if(!parent::run()){
 			return false;
 		}
@@ -26,13 +29,26 @@ class KernelTasksMathAdd extends KernelTasksTask{
 		//Load Inputs
 		$Input1 = $this->getTaskInput('Input1');
 		$Input2 = $this->getTaskInput('Input2');
-
-		$input1Val = $Input1->getValue();
-		$input2Val = $Input2->getValue(); 
-		$result = $input1Val + $input2Val;
 		
-		//code here
-		$this->setTaskOutput('Result', DataClassLoader::createInstance('Kernel.Data.Primitive.Number',$result));
+		if(!$Input1){
+			$succeeded = false;
+			$this->addError($this->getClassName(), 'Invalid Input Value Supplied: Input 1');
+		}else{
+			$input1Val = $Input1->getValue();
+		}
+		if(!$Input2){
+			$succeeded = false;
+			$this->addError($this->getClassName(), 'Invalid Input Value Supplied: Input 2');
+		}else{
+			$input2Val = $Input2->getValue();	
+		}
+		 
+		if($succeeded){
+			$result = $input1Val + $input2Val;
+			$this->setTaskOutput('Result', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $result));	
+		}
+		
+		$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $succeeded));
 		
 		return $this->completeTask();
 	}

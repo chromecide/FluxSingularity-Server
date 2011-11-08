@@ -13,7 +13,7 @@ class KernelDataPrimitiveTaskInput extends KernelDataPrimitiveNamedList{
 		$this->setValue('Type', 			DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	'Kernel.Data.Primitive.String'));
 		$this->setValue('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', 	false));
 		$this->setValue('AllowList', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', 	false));
-		$this->setValue('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	null));
+		//$this->setValue('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	null));
 		
 		$this->loadData($data);
 	}

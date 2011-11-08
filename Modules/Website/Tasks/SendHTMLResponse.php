@@ -23,7 +23,7 @@ class ModulesWebsiteTasksSendHTMLResponse extends KernelTasksTask{
 		
 		echo $html->getValue();
 		
-		$this->completeTask();
+		return $this->completeTask();
 	}
 }
 ?>

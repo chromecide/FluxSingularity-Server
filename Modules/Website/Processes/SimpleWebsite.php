@@ -26,7 +26,8 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 		$process = array(
 			'LocalData'=>array(
 					'ADMIN_URL'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', '/admin'),
-					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN BEEOTCH')
+					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN BEEOTCH'),
+					'OUTPUT_HTML'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'No Outout Supplied')
 			),
 			'Tasks'=>array(
 				'IF1'=>'Kernel.Tasks.Logic.If',
@@ -42,6 +43,9 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 						'IF1.Input1'
 					),
 					'ADMIN_MESSAGE'=>array(
+						'LocalData.OUTPUT_HTML'
+					),
+					'OUTPUT_HTML'=>array(
 						'OutputHTML.HTMLString'
 					)
 				),
@@ -58,26 +62,19 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 					)
 				),
 				'IF1'=>array(
-					'Completed'=>array(
-						'OR2.Enabled'
-					),
 					'Failed'=>array(
 						'LoadWebsitePage.Enabled'
 					),
+					'Completed'=>array(
+						'OR1.Reset'
+					),
 					'Succeeded'=>array(
-						'OR2.Inputs',
-						
+						'OR1.Inputs'
 					)
 				),
 				'LoadWebsitePage'=>array(
 					'Completed'=>array(
-						'OR1.Enabled'
-					),
-					'PageLoaded'=>array(
-						'OR1.Inputs'
-					),
-					'PageNotLoaded'=>array(
-						'OR1.Inputs'
+						'ProcessTemplate.Enabled'
 					),
 					'WebsitePage'=>array(
 						'ProcessTemplate.Page'
@@ -85,17 +82,13 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 				),
 				'OR1'=>array(
 					'Succeeded'=>array(
-						'ProcessTemplate.Enabled'
-					)
-				),
-				'OR2'=>array(
-					'Succeeded'=>array(
 						'OutputHTML.Enabled'
 					)
 				),
 				'ProcessTemplate'=>array(
-					'PageProcessed'=>array(
-						'OR2.Inputs'
+					'Completed'=>array(
+						'OR1.Reset',
+						'OR1.Inputs'
 					),
 					'HTML'=>array(
 						'OutputHTML.HTMLString'
@@ -103,7 +96,7 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 				),
 				'OutputHTML'=>array(
 					'Completed'=>array(
-						//'Outputs.Completed'
+						'Outputs.Completed'
 					)
 				)
 			)

@@ -19,6 +19,16 @@ class KernelDataFilesystemFolder extends KernelDataEntity{
 		$this->loadData($config);
 	}
 	
+	public function addFolder($folder){
+		$folders = $this->getValue('Folders');
+		
+		if(!($folders instanceof KernelDataPrimitiveNamedList)){
+			$folders = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+		}
+
+		$folders->addItem($folder->getValue('Name')->getValue(), $file);
+	}
+	
 	public function addFile($file){
 		$files = $this->getValue('Files');
 		

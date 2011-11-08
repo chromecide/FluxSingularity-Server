@@ -63,7 +63,7 @@ class ModulesWebsiteTasksProcessBasicTemplate extends KernelTasksTask{
 		$this->setOutputValue('PageProcessed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		$this->setOutputValue('HTML', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $htmlString));
 		
-		$this->completeTask();
+		return $this->completeTask();
 	}
 }
 ?>

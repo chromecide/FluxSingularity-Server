@@ -1,5 +1,5 @@
 <?php
-class KernelProcessesProcess extends KernelObject{
+class KernelProcessesProcess_old extends KernelObject{
 	protected $inputs = array();
 	protected $outputs = array();
 	
@@ -27,7 +27,7 @@ class KernelProcessesProcess extends KernelObject{
 		$this->_ClassName = 'Kernel.Processes.Process';
 		$this->_ClassTitle='Base Process Object';
 		$this->_ClassDescription = 'The basis for all Processes within the Flux Singularity platform';
-		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
+		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
 		$this->_ClassVersion = '0.4.0';
 		
 		
@@ -296,44 +296,50 @@ class KernelProcessesProcess extends KernelObject{
 
 	public function setTokenData($task, $param, $data){
 		
-		$taskObj = $this->tasks[$task];
-		if(!$taskObj){
-			echo 'task not loaded';
-			echo $task.' - '.$param.'<br/>';
-		}
-		
-		$field = $taskObj->getInputDefinition($param);
-		
-		if(!array_key_exists($task, $this->tokens)){
-			$this->tokens[$task] = array();
-		}
-		
-		if(!$field){
-			echo $task.':'.$param.'<br/>';
-		}else{
-			if($field->getValue('AllowList')){
-				
-				if($field->getValue('AllowList')->getValue()==true){
+		if($task!='LocalData'){
+			$taskObj = $this->tasks[$task];
+			if(!$taskObj){
+				echo 'task not loaded';
+				echo $task.' - '.$param.'<br/>';
+			}
+			
+			$field = $taskObj->getInputDefinition($param);
+			
+			if(!array_key_exists($task, $this->tokens)){
+				$this->tokens[$task] = array();
+			}
+			
+			if(!$field){
+				echo $task.':'.$param.'<br/>';
+			}else{
+				if($field->getValue('AllowList')){
 					
-					$newData = false;
-					if(array_key_exists($param, $this->tokens[$task])){
+					if($field->getValue('AllowList')->getValue()==true){
 						
-						$newData =$this->tokens[$task][$param];
-					}
-					
-					if(!($newData instanceof KernelDataPrimitiveList)){
+						$newData = false;
+						if(array_key_exists($param, $this->tokens[$task])){
+							
+							$newData =$this->tokens[$task][$param];
+						}
 						
-						$newData = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+						if(!($newData instanceof KernelDataPrimitiveList)){
+							
+							$newData = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+						}
+						$newData->addItem($data);
+					}else{
+						$newData = $data;
 					}
-					$newData->addItem($data);
 				}else{
 					$newData = $data;
 				}
-			}else{
-				$newData = $data;
+				
+				$this->tokens[$task][$param] = $newData;	
 			}
-			
-			$this->tokens[$task][$param] = $newData;	
+		}else{
+			echo $data->getValue().'<br/>';
+			$this->localData[$param] = $data;
+			//print_r($this->localData);
 		}
 	}
 	
@@ -402,7 +408,7 @@ class KernelProcessesProcess extends KernelObject{
 								if($targetValue && $targetValue->getValue()==true){
 									//reset the input values for the object
 									
-									return $this->resetTask($taskName);
+									return $this->resetTask($targetTaskName);
 									
 								}
 							}
@@ -440,7 +446,10 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function resetTask($taskName){
-		$this->tokens[$taskName] = array();
+		$this->trace[] = 'Resetting - '.$taskName;
+		$taskObj = $this->tasks[$taskName];
+		$taskObj->resetTask();
+		//$this->tokens[$taskName] = array();
 		//return $this->runPreProcessor();
 	}
 	public function processTokens(){
@@ -480,7 +489,7 @@ class KernelProcessesProcess extends KernelObject{
 		foreach($this->tasks as $taskName=>$task){
 			$this->trace[] = 'Preparing Task: '.$taskName;
 			$this->runPreProcessor($taskName);
-			$this->processTokens();
+			$this->processTokens($taskName);
 			if($taskName=='OR1'){
 				//print_r($this->tokens);
 			}

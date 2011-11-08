@@ -1,5 +1,36 @@
 <?php 
 
+/*
+Task Template:
+  
+ 
+ class KernelTasks extends KernelTasksTask{
+	public function __construct($data){
+		parent::__construct(false);
+		
+		$this->_ClassName = '';
+		$this->_ClassTitle='';
+		$this->_ClassDescription = '';
+		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
+		$this->_ClassVersion = '0.0.1';
+		
+		$this->inputs[''] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'', 'Type'=>'', 'Required'=>true, 'AllowList'=>true));
+		
+		$this->outputs[''] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'', 'Type'=>''));
+		
+	}
+	
+	public function run(){
+		if(!parent::run()){
+			return false;
+		}
+		
+		return $this->completeTask();
+	}
+} 
+ 
+*/
+
 /**
  * 
  * Base Object for all system tasks
@@ -26,7 +57,7 @@ class KernelTasksTask extends KernelObject{
 		$this->_ClassVersion = '0.4.0';
 		
 		$enabledDef = array('Name'=>'Enabled', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'DefaultValue'=>false, 'AllowList'=>false);
-		$resetDef = array('Name'=>'Reset', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'DefaultValue'=>false, 'AllowList'=>false);
+		$resetDef = array('Name'=>'Reset', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>false, 'DefaultValue'=>false, 'AllowList'=>false);
 		
 		$this->inputs['Enabled'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', $enabledDef);
 		$this->inputs['Reset'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', $resetDef);
@@ -51,6 +82,7 @@ class KernelTasksTask extends KernelObject{
 		}else{
 			if(!$this->validateInputs()){
 				$this->completeTask();
+				return false;
 			}else{
 				return true;
 			}
@@ -82,6 +114,13 @@ class KernelTasksTask extends KernelObject{
 		$this->setTaskInput('Enabled', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 	}
 	
+	public function resetTask(){
+		$this->setTaskOutput('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+		$this->setTaskOutput('Enabled', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+		$this->inputData = array();
+		//$this->setTaskOutput('Reset', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+	}
+	
 	public function isReady(){
 		$enabled = $this->getTaskInput('Enabled');
 		$completed = $this->getTaskOutput('Completed');
@@ -108,7 +147,11 @@ class KernelTasksTask extends KernelObject{
 	}
 	
 	public function getOutputDefinition($name){
-		return $this->outputs[$name];
+		if(array_key_exists($name, $this->outputs)){
+			return $this->outputs[$name];	
+		}else{
+			return null;
+		}
 	}
 	
 	public function setInputValue($name, $value){
@@ -129,8 +172,9 @@ class KernelTasksTask extends KernelObject{
 			$allowList = $allowedObj->getValue();
 			
 			//supplied as the appropriate type?
-			if($value instanceof $type){
-				if($required && $value->getValue()==null){
+			if(strpos($value->getClassName(), $type)!=-1){
+				
+				if($required && $value->getValue()===null){
 					$this->addError($this->getClassName(), 'Field Required: '.$name);
 					return false;
 				}else{
@@ -141,11 +185,17 @@ class KernelTasksTask extends KernelObject{
 						}
 						$targetValue->addItem($value);
 					}else{
-						$targetValue = $value;	
+						
+						try{
+							$targetValue = $value;
+						}catch(Exception $e){
+							print_r($e);
+						}
 					}
 				}
 			}else{
 				if($required && $value==null){
+					
 					$this->addError($this->getClassName(), 'Field Required: '.$name);
 					return false;
 				}else{
@@ -193,9 +243,7 @@ class KernelTasksTask extends KernelObject{
 		//print_r($fieldDef);
 		
 		if($fieldDef && ($fieldDef instanceof KernelDataPrimitiveTaskOutput)){
-			if($name=='Completed'){
-				//print_r($fieldDef);
-			}
+			
 			$typeObj = $fieldDef->getValue('Type');
 			$requiredObj = $fieldDef->getValue('Required');
 			$allowedObj = $fieldDef->getValue('AllowList');
@@ -228,20 +276,22 @@ class KernelTasksTask extends KernelObject{
 					return false;
 				}else{
 					if($allowList){
-						 $targetValue = $this->getOutputValue($name);
-						if(!($targetValue instanceof KernelDataPrimitiveList)){
-							$targetValue = DataClassLoader::createInstance('Kernel.Data.Primitive.List');	
+						if($value instanceof KernelDataPrimitiveList){
+							$targetValue = $value;	
+						}else{
+							$targetValue = $this->getOutputValue($name);
+							if(!($targetValue instanceof KernelDataPrimitiveList)){
+								$targetValue = DataClassLoader::createInstance('Kernel.Data.Primitive.List');	
+							}
+							$targetValue->addItem($value);	
 						}
-						
-						$targetValue->addItem($value);
-						
 					}else{
 						if($value instanceof KernelDataPrimitiveList){
-							$this->addError($this->getClassName(), 'Output Field Does not allow List Values: '.$name);
+							if($name!='Errors'){
+								$this->addError($this->getClassName(), 'Output Field Does not allow List Values: '.$name);
+							}
 							return false;
 						}else{
-							echo $name.'<br/>';
-							echo $type.':'.$value->getClassName().'<Br/>';
 							$targetValue = DataClassLoader::createInstance($type, $value);	
 						}
 					}
@@ -277,7 +327,7 @@ class KernelTasksTask extends KernelObject{
 				if($value instanceof KernelDataPrimitiveList){
 					$values = $value;
 				}
-				//$values->addItem($value);
+				$values->addItem($value);
 			}else{
 				$values = $value;
 			}
@@ -285,6 +335,7 @@ class KernelTasksTask extends KernelObject{
 			//echo 'no field for:'.$input.'<br/>';
 			$values = $value;
 		}
+		
 		$this->inputData[$input] = $values;
 	}
 	
@@ -321,9 +372,7 @@ class KernelTasksTask extends KernelObject{
 		$inputs = $this->getInputList();
 		
 		foreach($inputs as $inputName=>$inputCfg){
-			/*if(!($inputCfg instanceof KernelDataPrimitiveFieldDefinition)){
-				echo 'not a field def<br/>';
-			}*/
+			
 			$typeObj = $inputCfg->getValue('Type');
 			$requiredObj = $inputCfg->getValue('Required');
 			$canBeListObj = $inputCfg->getValue('AllowList');
@@ -342,15 +391,17 @@ class KernelTasksTask extends KernelObject{
 			$inputValue = $this->getInputValue($inputName);
 			
 			if($inputValue){
-				
 				if($canBeList){
 					if($inputValue instanceof KernelDataPrimitiveList){
 						
 					}else{
+						
 						$this->addError($this->getClassName(), $inputName.' requires an Input with the Type of '.$type.'; A '.$inputValue->getClassName().' was supplied.');
 					}
 				}else{
+					
 					if($inputValue->getClassName()!=$type){
+						
 						$classNames = class_parents($inputValue);
 						$typeFound = false;
 						
@@ -373,11 +424,15 @@ class KernelTasksTask extends KernelObject{
 			}else{
 				if($required){
 					if($defaultValue!==null){
-						if($defaultValue instanceof $type){
+						$typeString = str_replace('.', '', $type);
+						echo '<br/><Br/>';
+						print_r($defaultValue);
+						echo '<br/><Br/>';
+						/*if(($defaultValue instanceof $typeString) || in_array($typeString, class_parents($defaultValue))){
 							$this->setInputValue($inputName, $defaultValue);
 						}else{
 							$this->setInputValue($inputName, DataClassLoader::createInstance($type, $defaultValue));	
-						}
+						}*/
 						
 					}else{
 						$this->addError($this->getClassName(), $inputName.' is a required Input');
@@ -385,9 +440,7 @@ class KernelTasksTask extends KernelObject{
 				}
 			}
 		}
-		
 		if($this->getErrorCount()>0){
-			
 			return false;
 		}else{
 			return true;
@@ -407,12 +460,14 @@ class KernelTasksTask extends KernelObject{
 	}
 	
 	public function addError($className, $message, $errorNum=null){
-		echo 'setting error value '.$className.'<Br/>';
-		print_r($message);
-				die();
-		$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.String', true));
+		
+		$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		
 		$errors = $this->getOutputValue('Errors');
+		
+		if(!$errors instanceof KernelDataPrimitiveList){
+			$errors = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+		}
 		
 		$errorItem = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
 		$errorItem->setValue('Class', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $className));
