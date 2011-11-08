@@ -1,13 +1,13 @@
 <?php
 class KernelTasksDataCreateDataDefinition extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.CreateDefinition';
 		$this->_ClassTitle='Create an Entity Definition';
-		$this->_ClassDescription = 'This task loads command line arguments when a process is executed from a command line';
+		$this->_ClassDescription = 'Creates an Entity Definition Object Using the supplied parameters.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->inputs['ClassName'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Class Name', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->inputs['Title'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Title', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));

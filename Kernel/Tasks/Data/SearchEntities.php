@@ -7,7 +7,7 @@ class KernelTasksDataSearchEntities extends KernelTasksTask{
 		$this->_ClassTitle='Search Entities';
 		$this->_ClassDescription = 'Search Entities using the supplied Conditions';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.5.0';
 		
 		$this->inputs['Store'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Store', 'Type'=>'Kernel.Data.DatStore', 'Required'=>true));
 		$this->inputs['Entity'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Entity Name', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true));

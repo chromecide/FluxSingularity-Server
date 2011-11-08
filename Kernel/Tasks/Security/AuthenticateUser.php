@@ -1,8 +1,9 @@
 <?php
 class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 	
-	public function __construct(){
-		parent::__construct($data);
+	public function __construct($data){
+		parent::__construct(false);
+		
 		$this->_ClassName = 'Kernel.Tasks.Security.AuthenticateUser';
 		$this->_ClassTitle='Authenticate a Flux Singularity User';
 		$this->_ClassDescription = 'Authenticate a User agianst a Supplied Data Source';
@@ -31,8 +32,8 @@ class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 		
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		
@@ -59,6 +60,7 @@ class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 		
 		$store = $this->getTaskInput('Store');
 		
+		
 		if(!$store){
 			$store = getKernelStore();	
 		}
@@ -66,7 +68,7 @@ class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 		$qUser = DataClassLoader::createInstance('Kernel.Data.Security.User');
 		
 		$user = $store->findOne($qUser, $conditionGroup);
-		
+		print_r($user);
 		if($user){
 			$this->setTaskOutput('User', $user);
 			$this->setTaskOutput('AuthenticationFailed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));

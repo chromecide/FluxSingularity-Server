@@ -1,5 +1,5 @@
 <?php 
-class KernelDataPrimitiveCondition extends KernelDataPrimitive{
+class KernelDataPrimitiveCondition extends KernelDataPrimitiveNamedList{
 	public function __construct($data){
 		parent::__construct($data);
 		
@@ -9,19 +9,11 @@ class KernelDataPrimitiveCondition extends KernelDataPrimitive{
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.7.0';
 		
-		$this->fields[] = array('Attribute', 'Kernel.Data.Primitive.String', true, false);
-		$this->fields[] = array('Operator', 'Kernel.Data.Primitive.String', true, false);
-		$this->fields[] = array('Value', 'Kernel.Data.Primitive', true, false);
+		$this->addItem('Attribute', null);
+		$this->addItem('Operator', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String', 	'=='));
+		$this->addItem('Value', 	null);
 		
 		$this->loadData($data);
-	}
-	
-	public function setValue($field, $value){
-		$this->data[$field] = $value;
-	}
-	
-	public function getValue($field){
-		return $this->data[$field];
 	}
 	
 	public function loadData($data){

@@ -1,5 +1,5 @@
 <?php 
-class KernelDataPrimitiveConditionGroup extends KernelDataPrimitive{
+class KernelDataPrimitiveConditionGroup extends KernelDataPrimitiveNamedList{
 	public function __construct($data){
 		parent::__construct($data);
 		
@@ -9,23 +9,18 @@ class KernelDataPrimitiveConditionGroup extends KernelDataPrimitive{
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.7.0';
 		
-		$this->fields['Type'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Type', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
-		$this->fields['Conditions'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Conditions', 'Type'=>'Kernel.Data.Primitive.Condition', 'Required'=>true, 'AllowList'=>true));
-		
+		$this->setValue('Type', DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'Kernel.Data.Primitive.String'));
+		$this->setValue('Conditions', DataClassLoader::createInstance('Kernel.Data.Primitive.List'));
 		$this->loadData($data);
 	}
 	
-	public function setValue($field, $value){
-		$this->data[$field] = $value;
-	}
-	
-	public function getValue($field){
-		return $this->data[$field];
-	}
-	
 	public function addCondition($attribute, $operator='==', $value=null){
+		$conditions = $this->getValue('Conditions');
+		if(!($conditions instanceof KernelDataPrimitiveList)){
+			$conditions = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+		}
 		if($attribute instanceof KernelDataPrimitiveCondition || $attribute instanceof KernelDataPrimitiveConditionGroup){
-			$this->data['Conditions'][] = $attribute;
+			$conditions->addItem($attribute);
 		}else{
 			$params = array(
 				'Attribute'=>$attribute,
@@ -35,18 +30,13 @@ class KernelDataPrimitiveConditionGroup extends KernelDataPrimitive{
 			
 			$item = DataClassLoader::createInstance('Kernel.Data.Primitive.Condition', $params);
 			
-			$this->data['Conditions'][]=$item;
+			$conditions->addItem($item);
 		}
+		$this->setValue('Conditions', $conditions);
 	}
 	
 	public function getConditions(){
-		$localConditions =  $this->data['Conditions'];
-		$conditions = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
-		
-		foreach($localConditions as $condition){
-			$conditions->addItem($condition);
-		}
-		
+		$conditions = $this->getValue('Conditions');
 		return $conditions;
 	}
 	

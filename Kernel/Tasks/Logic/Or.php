@@ -6,14 +6,14 @@
  *
  */
 class KernelTasksLogicOr extends KernelTasksTask{
-	public function __construct($inputVal1, $operator, $inputVal2){
-		parent::__construct();
+	public function __construct($data){
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Logic.Or';
 		$this->_ClassTitle='Logical OR Task';
 		$this->_ClassDescription = 'Succeeds if any of the Inputs are true';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.9.9';
 		
 		
 		$this->inputs['Inputs'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Input List', 'Type'=>'Kernel.Data.Primitive.Boolean', 'Required'=>true, 'AllowList'=>true));
@@ -22,17 +22,28 @@ class KernelTasksLogicOr extends KernelTasksTask{
 		$this->outputs['Failed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Failed', 'Type'=>'Kernel.Data.Primitive.Boolean'));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		
 		$inputs = $this->getTaskInput('Inputs');
-		$inputCount = $inputs->Count();
-		$succeeded = false;
+		$inputCount=-1;
+		if($inputs instanceof KernelDataPrimitiveList){
+			$inputCount = $inputs->Count();	
+		}else{
+			if($inputs instanceof KernelDataPrimitiveBoolean){
+				$inputCount=1;
+				$inputItem = $inputs;
+				$inputs = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+				$inputs->addItem($inputItem);
+			}
+		}
 		
+		$succeeded = false;
+
 		for($i=0;$i<$inputCount;$i++){
-			$item = $inputs->getItem($i+1);
+			$item = $inputs->getItem($i);
 			if($item){
 				if($item->getValue()===true){
 					$succeeded = true;
@@ -47,7 +58,7 @@ class KernelTasksLogicOr extends KernelTasksTask{
 			$this->setTaskOutput('Succeeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 			$this->setTaskOutput('Failed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
-		
+
 		return $this->completeTask();
 	}
 }

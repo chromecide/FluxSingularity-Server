@@ -1,13 +1,13 @@
 <?php 
 class KernelTasksDataLoadEntityById extends KernelTasksTask{
 	public function __construct($data){
-		parent::__construct($data);
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.LoadEntityById';
 		$this->_ClassTitle='Load Entity By ID';
 		$this->_ClassDescription = 'Loads an Entity using it\'s unique ID';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.5.0';
 		
 		$this->inputs['EntityType'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Entity Type', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true));
 		$this->inputs['EntityID'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Entity ID', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true));

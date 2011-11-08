@@ -1,7 +1,7 @@
 <?php 
 class ModulesWebsiteTasksSendHTMLResponse extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Modules.Website.Tasks.SendHTMLResponse';
 		$this->_ClassTitle='Send HTML Response';
@@ -13,16 +13,17 @@ class ModulesWebsiteTasksSendHTMLResponse extends KernelTasksTask{
 		$this->inputs['HTMLString'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'HTML String', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true));
 	}
 	
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		
+		if(!parent::run()){
 			return false;
 		}
 		
-		$html = $this->getTaskInput('HTMLString');
+		$html = $this->getInputValue('HTMLString');
 		
 		echo $html->getValue();
 		
-		$this->completeTask();
+		return $this->completeTask();
 	}
 }
 ?>

@@ -13,9 +13,6 @@ $FSKernel = DataClassLoader::createInstance('Kernel');
 
 $process = array(
 	'Definition'=>array(
-		'Defaults'=>array(
-			'Create Kernel File List.Format'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'HTML'),
-		),
 		'LocalData'=>array(
 			'LoopCount'=>DataClassLoader::createInstance('Kernel.Data.Primitive.Number', 0)
 		),
@@ -28,7 +25,7 @@ $process = array(
 			'Create Kernel File List'=>'Kernel.Tasks.System.CreateKernelFileList',
 			'Create Module File List'=>'Kernel.Tasks.System.CreateModuleFileList',
 			'AND'=> 'Kernel.Tasks.Logic.And',
-			'Join Strings'=>'Kernel.Tasks.Data.JoinStrings',
+			'Join Strings'=>'Kernel.Tasks.Data.String.JoinStrings',
 			'Output HTML'=>'Modules.Website.Tasks.SendHTMLResponse'
 		),
 		'TaskMap'=>array(
@@ -88,8 +85,8 @@ $process = array(
 	)
 );
 
-$FSKernel->runTempProcess($process);
 
+$process = $FSKernel->runTempProcess($process);
 
 function readableByteString($bytes){
     $units = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
@@ -99,5 +96,4 @@ function readableByteString($bytes){
 }
 
 echo '<hr>Used: '.readableByteString(memory_get_peak_usage()).' Peak Memory';
-
 ?>

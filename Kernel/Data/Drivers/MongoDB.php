@@ -13,7 +13,7 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 		$this->_ClassTitle='MongoDB Database Driver';
 		$this->_ClassDescription = 'A MongoDB Database driver for use with Flux Singularity Data Sources';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.4.0';
 		
     	$this->connect($config);
     	
@@ -94,22 +94,25 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 	
 	public function itemToEntity($obj, $resolveRefs=false){
 		$retObj = DataClassLoader::createInstance($obj['KernelClass']);
+		
 		$extendedFields = array();
 		//handle extended classes first
-		if($obj['KernelExtends'] && is_array($obj['KernelExtends']) && count($obj['KernelExtends'])>0){
-			//load the extended item
-			$db = $this->db;
-			
-			foreach($obj['KernelExtends'] as $parentClassName=>$parentRef){
-				$parentData = $db->getDBRef($parentRef);
-				$parentItem = DataClassLoader::createInstance($parentClassName, $parentData);
-				$parentFields = $parentItem->getFields();
+		if(array_key_exists('KernelExtends', $obj)){
+			if($obj['KernelExtends'] && is_array($obj['KernelExtends']) && count($obj['KernelExtends'])>0){
+				//load the extended item
+				$db = $this->db;
 				
-				foreach($parentFields as $parentFieldName=>$parentFieldValue){
-					if(strpos($parentFieldName, 'Kernel')!==0){
-						$parentVal = $parentItem->getValue($parentFieldName);
-						$retObj->setValue($parentFieldName, $parentVal);
-						$extendedFields[$parentFieldName] = true;
+				foreach($obj['KernelExtends'] as $parentClassName=>$parentRef){
+					$parentData = $db->getDBRef($parentRef);
+					$parentItem = DataClassLoader::createInstance($parentClassName, $parentData);
+					$parentFields = $parentItem->getFields();
+					
+					foreach($parentFields as $parentFieldName=>$parentFieldValue){
+						if(strpos($parentFieldName, 'Kernel')!==0){
+							$parentVal = $parentItem->getValue($parentFieldName);
+							$retObj->setValue($parentFieldName, $parentVal);
+							$extendedFields[$parentFieldName] = true;
+						}
 					}
 				}
 			}
@@ -120,7 +123,10 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 		foreach($fields as $fieldName=>$fieldCfg){
 			//echo 'Loading: '.$fieldName.'<br/>';
 			if(!array_key_exists($fieldName, $extendedFields)){
-				$objectValue = $obj[$fieldName];
+				$objectValue = null;
+				if(array_key_exists($fieldName, $obj)){
+					$objectValue = $obj[$fieldName];
+				}
 				if($objectValue!==null){
 					if($fieldCfg->getValue('AllowList')->getValue()==true){
 						if(is_array($objectValue)){
@@ -148,11 +154,12 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 							if($resolveRefs){
 								$db = $this->db;
 								$item = $db->getDBRef($objectValue);
+								
 							}else{
-								echo 'find a solution for when not resolving refs netedly<br/>';
+								echo 'find a solution for when not resolving refs nestedly<br/>';
 								echo 'suggestion: something to do with lazy loading of data';
 							}
-							$retObj->setValue($fieldName, $item);
+							$retObj->setValue($fieldName, DataClassLoader::createInstance($fieldCfg->getValue('Type')->getValue(), $item));
 						}else{
 							$retObj->setValue($fieldName, DataClassLoader::createInstance($fieldCfg->getValue('Type')->getValue(), $objectValue));	
 						}

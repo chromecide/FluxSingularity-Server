@@ -30,7 +30,7 @@ class KernelDataEntity extends KernelData{
 		$this->_ClassTitle='Kernel Entity Base Object';
 		$this->_ClassDescription = 'Entity Objects are Data Objects that, when saved, require a Unique ID.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->data = array();
 		
@@ -44,13 +44,16 @@ class KernelDataEntity extends KernelData{
 		$this->fields['KernelModifiedBy'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedBy', 'Type'=>'Kernel.Data.Security.User', 'Required'=>false));
 		$this->fields['KernelModifiedDate'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'KernelModifiedAt', 'Type'=>'Kernel.Data.Primitive.DateTime', 'Required'=>false));
 		
-		if($data){
-			if($data['extends']){
-				foreach($data['extends'] as $extend){
+		if(is_array($data) && array_key_exists('extends', $data)){
+			foreach($data['extends'] as $extend){
+				$this->extendClass($extend);	
+			}	
+		}else{
+			if(is_object($data) && $data->extends){
+				foreach($data->extends as $extend){
 					$this->extendClass($extend);	
 				}	
 			}	
-			$this->loadData($data);
 		}
 
 		if(self::$kernelStore){
@@ -60,36 +63,44 @@ class KernelDataEntity extends KernelData{
 	
 	
 	function loadData($data){
-		if($data['KernelID']){
+		if(!is_array($data)){
+			$data = array();	
+		}
+		
+		if(array_key_exists('KernelID', $data)){
 			$this->setValue('KernelID', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelID']));
 		}
 
-		if($data['KernelClass']){
+		if(array_key_exists('KernelClass', $data)){
 			$this->setValue('KernelClass', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelClass']));
 		}else{
 			$this->setValue('KernelClass', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $this->getClassName()));
 		}
 
-		if($data['KernelName']){
+		if(array_key_exists('KernelName', $data)){
 			$this->setValue('KernelName', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelName']));
 		}
 
-		if($data['KernelDescription']){
+		if(array_key_exists('KernelDescription', $data)){
 			$this->setValue('KernelDescription', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelDescription']));
 		}
 
-		if($data['KernelRevision']){
+		if(array_key_exists('KernelRevision', $data)){
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['KernelRevision']));
 		}
 		
-		if($data['Store']){
+		if(array_key_exists('Store', $data)){
 			$this->store = $data['Store'];
 		}
 		$fields = $this->getFields();
 		
 		foreach($fields as $fieldName=>$fieldCfg){
 			
+<<<<<<< HEAD
 			if($data[$fieldName]){
+=======
+			if(array_key_exists($fieldName, $data)){
+>>>>>>> Development-Main
 				if($fieldCfg instanceof KernelDataPrimitiveFieldDefinition){
 					$type = $fieldCfg->getValue('Type')->getValue();
 					$allowList = $fieldCfg->getValue('AllowList')->getValue();
@@ -117,6 +128,7 @@ class KernelDataEntity extends KernelData{
 								}
 							}
 						}else{
+							
 							$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));	
 						}
 					}
@@ -137,7 +149,6 @@ class KernelDataEntity extends KernelData{
 		if($class){
 			$classFields = $class->getFields();
 			foreach($classFields as $fieldName=>$fieldCfg){
-				//echo '&nbsp;&nbsp;extending field: '.$fieldName.'<br/>';
 				$this->fields[$fieldName] = $fieldCfg;
 			}
 			$this->extends[$className] = $class;
@@ -147,7 +158,10 @@ class KernelDataEntity extends KernelData{
 	 * Entity Getter and Setter Functions
 	 */
 	function setValue($fieldName, $value){
-		$currentValue = $data[$fieldName];
+		$currentValue = null;
+		if(array_key_exists($fieldName, $this->data)){
+			$currentValue = $this->data[$fieldName];	
+		}
 		
 		if($value!=$currentValue){
 			$this->changedFields[] = $fieldName;
@@ -159,12 +173,16 @@ class KernelDataEntity extends KernelData{
 		if($fieldName===null){
 			return $this->toBasicObject();
 		}else{
-			$value = $this->data[$fieldName];
-			if(in_array('KernelData', class_parents($value))){
-				$retValue = $value;
+			if(array_key_exists($fieldName, $this->data)){
+				$value = $this->data[$fieldName];	
+				if(in_array('KernelData', class_parents($value))){
+					$retValue = $value;
+				}else{
+					$retValue = $defaultValue;
+				}	
 			}else{
-				$retValue = $defaultValue;
-			}	
+				return null;
+			}
 		}
 		
 		
@@ -284,14 +302,17 @@ class KernelDataEntity extends KernelData{
 		}
 		
 		$kernelVersion = $this->getValue('KernelVersion');
+		
 		if($kernelVersion){
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $this->incrementRevision($kernelVersion->getValue())));
 		}else{
 			$this->setValue('KernelRevision', DataClassLoader::createInstance('Kernel.Data.Primitive.String', '1.0.0'));
 		}
+		
 		$return = $this->store->save($this);
 		
 		$this->afterSave();
+		
 		return $return;
 	}
 	
@@ -320,9 +341,9 @@ class KernelDataEntity extends KernelData{
 			$kernelID = $this->getValue('KernelID');
 			
 		}
-		echo $this->collectionName.'<br/>';
+		//echo $this->collectionName.'<br/>';
 		$ref =  $this->store->getEntityReference($this);
-		echo 'here';
+		//echo 'here';
 		return $ref;
 	}
 	
@@ -340,6 +361,7 @@ class KernelDataEntity extends KernelData{
 	function toBasicObject(){
 		$ret = new stdClass();
 		$ret->KernelClass = $this->getClassName();
+		
 		foreach($this->fields as $field=>$fieldDef){
 			$type = $fieldDef->getItem('Type')->getValue();
 			$required = $fieldDef->getItem('Required')->getValue();
@@ -353,8 +375,6 @@ class KernelDataEntity extends KernelData{
 			if($valueObj){
 				switch($fieldType){
 					case 'Kernel.Data.Primitive.List':
-						$value = $valueObj->toJSON();
-						break;
 					case 'Kernel.Data.Primitive.NamedList':
 						$value = $valueObj->toBasicObject();
 						break;
@@ -362,11 +382,17 @@ class KernelDataEntity extends KernelData{
 						$parentClasses = class_parents($valueObj);
 						//if it's a primitive type, just call the get function
 						if(in_array('KernelDataPrimitive', $parentClasses)){
-							$value = $valueObj->getValue();
+							if($valueObj instanceof KernelDataPrimitiveList){
+								$value = $valueObj->toBasicObject();
+							}else{
+								$value = $valueObj->getValue();	
+							}
 						}else{
+							
 							//if it's an entity type call it's corresponding toJSON function
 							if(in_array('KernelDataEntity', $parentClasses)){
-								$value = $valueObj->toJSON();
+								
+								$value = $valueObj->toBasicObject();
 							}
 						}
 						
@@ -469,7 +495,7 @@ class KernelDataEntity extends KernelData{
 							}else{
 								//list is the right type
 								//if required, ensure the list has at least 1 item
-								if($required && $fieldValue->Count()>0){
+								if($required && $fieldValue->Count()<1){
 									$this->validationErrors[] = array('InvalidValue', $field.' expects at least one list item');
 									$valid = false;
 								}

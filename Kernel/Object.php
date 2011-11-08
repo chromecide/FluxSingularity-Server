@@ -8,14 +8,20 @@
 class KernelObject{
 	protected $initialConfig;
 	
+	protected $_ClassName='';
+	protected $_ClassTitle='';
+	protected $_ClassDescription='';
+	protected $_ClassAuthor='';
+	protected $_ClassVersion='';
+	
 	public function __construct($config){
 		$this->_ClassName = 'Kernel.Object';
 		$this->_ClassTitle='Kernel Base Object';
 		$this->_ClassDescription = 'This is the base object that all other objects within Flux Singularity are based on';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com>';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
-		$this->initialConfig = $config;
+		//$this->initialConfig = $config;
 	}
 	
 	/**

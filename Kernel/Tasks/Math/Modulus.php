@@ -1,13 +1,13 @@
 <?php
 class KernelTasksMathModulus extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Math.Modulus';
 		$this->_ClassTitle='Modulus';
 		$this->_ClassDescription = '';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.6.0';
 		
 		//Inputs
 
@@ -19,8 +19,8 @@ class KernelTasksMathModulus extends KernelTasksTask{
 		$this->outputs['Remainder'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Result', 'Type'=>'Kernel.Data.Primitive.Number'));
 	}
 
-	public function runTask(){
-		if(!parent::runTask()){
+	public function run(){
+		if(!parent::run()){
 			return false;
 		}
 		//Defaults

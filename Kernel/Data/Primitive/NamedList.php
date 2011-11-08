@@ -17,7 +17,7 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 			if(is_array($data) || is_object($data)){
 				foreach($data as $field=>$value){
 					if(is_array($value)){
-						if($value['KernelClass']){
+						if(array_key_exists('KernelClass', $value)){
 							$this->addItem($field, DataClassLoader::createInstance($value['KernelClass'], $value));
 						}
 					}else{
@@ -28,19 +28,6 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 				$this->data[] = $data;
 			}
 		}
-	}
-	
-	public function get(){
-		$ret = null;
-		foreach($this->data as $key=>$item){
-			if($ret){$ret.=', ';}
-			if(in_array('KernelData', class_parents($item))){
-				$ret .=$key.'='.$item->get();
-			}else{
-				$ret .=$key.'='.$item;
-			}
-		}	
-		return $ret;
 	}
 	
 	public function setType($type){
@@ -63,7 +50,7 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 		$this->addItem($name, $value);
 	}
 	
-	public function getValue($name, $value){
+	public function getValue($name){
 		if(!$name){
 			return $this->toBasicObject();
 		}else{
@@ -73,13 +60,19 @@ class KernelDataPrimitiveNamedList extends KernelDataPrimitive{
 	}
 	
 	public function getItem($name){
-		return $this->items[$name];
+		if(array_key_exists($name, $this->items)){
+			return $this->items[$name];	
+		}else{
+			return null;
+		}
+		
 	}
 	
 	public function toBasicObject(){
 		$ret = new stdClass();
 		
 		foreach($this->items as $key=>$value){
+			echo $key.'<br/>';
 			if($value instanceof KernelDataPrimitiveNamedList){
 				$ret->$key = $value->toBasicObject();
 			}elseif(in_array('KernelDataPrimitive', class_parents($value))){

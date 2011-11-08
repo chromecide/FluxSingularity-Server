@@ -1,13 +1,13 @@
 <?php
 class KernelTasksDataDeleteDataDefinition extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.DeleteDataDefinition';
 		$this->_ClassTitle='Remove a Data Definition';
 		$this->_ClassDescription = 'This task will remove a data definition and all entity instances based on the data definition';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		//Inputs
 		$this->inputs['Store'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Store', 'Type'=>'Kernel.Data.DatStore', 'Required'=>true));

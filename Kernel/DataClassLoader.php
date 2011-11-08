@@ -15,7 +15,7 @@ class DataClassLoader{
 		$meta->Title = 'Core Data Class Loader';
 		$meta->Description = 'Loads Flux Singularity Classes based on dot notation';
 		$meta->Author = 'Justin Pradier';
-		$meta->Version = '0.9.0';
+		$meta->Version = '0.4.0';
 		
 		return $meta;
 	}
@@ -106,7 +106,7 @@ class DataClassLoader{
 			
 			return $item;
 		}else{
-			throw new Exception("Could not create class: $className", 1);
+			throw new Exception("Could not create class: ($className)", 1);
 			//return 'could not find class';
 		}
 	}

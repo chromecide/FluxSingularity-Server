@@ -8,7 +8,7 @@ class KernelDataSecurityUser extends KernelDataEntity{
 		$this->_ClassTitle='Security User';
 		$this->_ClassDescription = 'Base system user, used for authenticating sessions';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.9.1';
+		$this->_ClassVersion = '0.9.0';
 		
 		$this->collectionName = 'Kernel.Security.Users';
 		

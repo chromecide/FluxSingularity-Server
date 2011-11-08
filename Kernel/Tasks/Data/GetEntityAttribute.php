@@ -1,13 +1,13 @@
 <?php
 class KernelTasksDataGetEntityAttribute extends KernelTasksTask{
 	public function __construct(){
-		parent::__construct();
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Tasks.Data.GetEntityAttribute';
 		$this->_ClassTitle='Gets Entity Attribute';
 		$this->_ClassDescription = 'Retrieves the value of an Entity Attribute';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.5.0';
 		
 		//Inputs
 		$this->inputs['Entity'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'Entity', 'Type'=>'Kernel.Data.Entity', 'Required'=>true));

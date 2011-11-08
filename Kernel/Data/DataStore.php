@@ -3,13 +3,14 @@ class KernelDataDataStore extends KernelObject{
 	protected $driver = null;
 	
 	public function __construct($config){
+		
 		$this->_ClassName = 'Kernel.Data.DataStore';
 		$this->_ClassTitle='Kernel Base Data Store Object';
 		$this->_ClassDescription = 'This is the base Data store object that all data sources are based on.';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '0.8.0';
 		
-		if($config['Driver']){
+		if(array_key_exists('Driver', $config)){
 			if($this->loadDriver($config['Driver'])){
 				$this->driver->connect($config);
 			}
@@ -18,7 +19,6 @@ class KernelDataDataStore extends KernelObject{
 	
 	protected function loadDriver($driverName, $config=null){
 		$driverClass = 'Kernel.Data.Drivers.'.$driverName;
-		
 		$driver = DataClassLoader::createInstance($driverClass, $config);
 		$this->driver = $driver;
 		return true;

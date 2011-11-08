@@ -6,7 +6,7 @@ class KernelTasksDaemonsLoadCommandLineArgs extends KernelTasksTask{
 		$this->_ClassTitle='Load Command Line Arguments';
 		$this->_ClassDescription = 'This task loads command line arguments when a process is executed from a command line';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.8.0';
+		$this->_ClassVersion = '0.5.0';
 		
 		$this->outputs['ArgCount'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Argument Count', 'Type'=>'Kernel.Data.Primitive.Number'));
 		$this->outputs['Arguments'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'Arguments', 'Type'=>'Kernel.Data.Primitive.NamedList'));

@@ -1,13 +1,13 @@
 <?php 
 class KernelDataFilesystemFolder extends KernelDataEntity{
 	public function __construct($config){
-		parent::__construct($config);
+		parent::__construct(false);
 		
 		$this->_ClassName = 'Kernel.Data.Filesystem.Folder';
 		$this->_ClassTitle='Kernel Base Folder Object';
 		$this->_ClassDescription = 'Base Folder object for tracking Folder information';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
-		$this->_ClassVersion = '0.7.0';
+		$this->_ClassVersion = '0.4.0';
 		
 		$this->collectionName = 'Kernel.Data.Filesystem.Files';
 		
@@ -19,16 +19,16 @@ class KernelDataFilesystemFolder extends KernelDataEntity{
 		$this->loadData($config);
 	}
 	
-	public function loadData($data){
-		if($data['Name']){
-			$this->setValue('Name', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['Name']));	
-		}
+	public function addFolder($folder){
+		$folders = $this->getValue('Folders');
 		
-		if($data['Path']){
-			$this->setValue('Path', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $data['Path']));	
+		if(!($folders instanceof KernelDataPrimitiveNamedList)){
+			$folders = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
 		}
-	}
 
+		$folders->addItem($folder->getValue('Name')->getValue(), $file);
+	}
+	
 	public function addFile($file){
 		$files = $this->getValue('Files');
 		

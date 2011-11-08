@@ -14,9 +14,9 @@ class ModulesWebsiteDataSimplePage extends KernelDataEntity{
 		$this->fields['Domain'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Domain', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->fields['PagePath'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Page Path', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		$this->fields['Title'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Title', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
-		$this->fields['Header'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Header', 'Type'=>'Modules.Website.Data.SimpleHeader', 'Required'=>true, 'AllowList'=>true));
-		$this->fields['Footer'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Footer', 'Type'=>'Modules.Website.Data.SimpleFooter', 'Required'=>true, 'AllowList'=>true));
-		$this->fields['Content'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Content', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>true));
+		$this->fields['Header'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Header', 'Type'=>'Modules.Website.Data.SimpleHeader', 'Required'=>true, 'AllowList'=>false));
+		$this->fields['Footer'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Footer', 'Type'=>'Modules.Website.Data.SimpleFooter', 'Required'=>true, 'AllowList'=>false));
+		$this->fields['Content'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Content', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>true, 'AllowList'=>false));
 		
 		//$this->fields['PageHTML'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'Page HTML', 'Type'=>'Kernel.Data.Primitive.String', 'Required'=>false, 'AllowList'=>false));
 		

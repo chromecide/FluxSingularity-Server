@@ -10,12 +10,14 @@ class Kernel{
 		$meta->Title = 'Core Kernel Object';
 		$meta->Description = 'Provides the Core Entry Point for Flux Singularity';
 		$meta->Author = 'Justin Pradier';
-		$meta->Version = '0.5.0';
+		$meta->Version = '0.4.0';
 		
 		return $meta;
 	}
 	
 	public function __construct($config){
+		date_default_timezone_set('Australia/Melbourne');
+		 
 		DataClassLoader::loadClass('Kernel.Object');
 		
 		//Data
@@ -57,14 +59,18 @@ class Kernel{
 	}
 	
 	public function parseConfig($config){
-		if($config['KernelStore']){
-			$this->loadKernelStore($config['KernelStore']);
-			KernelDataEntity::$kernelStore = $this->getKernelStore();
+		if($config){
+			if(array_key_exists('KernelStore', $config)){
+				$this->loadKernelStore($config['KernelStore']);
+				KernelDataEntity::$kernelStore = $this->getKernelStore();
+				KernelTasksTask::$kernelStore = $this->getKernelStore();
+			}
+	
+			if(array_key_exists('User', $config)){
+				$this->loadUser($config['User']);
+			}	
 		}
-
-		if($config['User']){
-			$this->loadUser($config['User']);
-		}
+		
 	}
 	
 	public function getKernelStore(){
@@ -119,29 +125,31 @@ class Kernel{
 	}
 	
 	public function runTempProcess($processCfg){
+		//print_r($processCfg);
 		$process = DataClassLoader::createInstance('Kernel.Processes.Process', $processCfg);
-		$process->runProcess();	
+		$process->run();
+		return $process;	
 	}
 	
 	public function runProcess($processName, $inputArray=array(), $outputHTMLResults=false){
 		
 		try{
-			$process = DataClassLoader::createInstance($processName);
+			$process = DataClassLoader::createInstance($processName, $inputArray);
 		}catch (Exception $e){
 			echo 'Error Loading Class<br/><br/>';
 			$this->errors[] = $e;
 			return false;
 		}
 		
-		if($process){
+		/*if($process){
 			if($inputArray && is_array($inputArray) && count($inputArray)>0){
 				foreach($inputArray as $inputName=>$inputValue){
 					$process->setProcessInput($inputName, $inputValue);
 				}
 			}
-		}
+		}*/
 		
-		$results = $process->runProcess();
+		$results = $process->run();
 		
 		if($outputHTMLResults){
 			
