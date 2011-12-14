@@ -68,12 +68,7 @@ class KernelTasksTask extends KernelObject{
 		
 		$this->outputs['Completed'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', $completedDef);
 		$this->outputs['ErrorOcurred'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', $errorOcurredDef);
-		$this->outputs['Errors'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', $errorsDef);
-		
-		
-		//$this->setOutputValue('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $completed));
-		//$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $errored));
-		//$this->setOutputValue('Errors', DataClassLoader::createInstance('Kernel.Data.Primitive.List'));
+		$this->outputs['Errors'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', $errorsDef);	
 	}
 	
 	public function run(){
@@ -99,11 +94,9 @@ class KernelTasksTask extends KernelObject{
 		$errored = false;
 
 		if($this->getErrorCount()>0){
-			echo 'Errors: '.$this->getErrorCount().'<br/>';
 			$completed = false;
 			$errored = true;
 		}
-		
 		$this->setOutputValue('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $completed));
 		$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $errored));
 		
@@ -170,6 +163,14 @@ class KernelTasksTask extends KernelObject{
 			$type = $typeObj->getValue();
 			$required = $requiredObj->getValue();
 			$allowList = $allowedObj->getValue();
+			
+			if(!method_exists($value, 'getClassName')){
+				echo '----'."\n";
+				echo $name."\n";
+				echo $this->getClassName();
+				print_r($value);
+				echo '----'."\n";
+			}
 			
 			//supplied as the appropriate type?
 			if(strpos($value->getClassName(), $type)!=-1){
@@ -255,7 +256,7 @@ class KernelTasksTask extends KernelObject{
 			//supplied as the appropriate type?
 			
 			if($value && ($value->getClassName() == $type)){
-				if($required && $value->getValue()==null){
+				if($required && $value->getValue()===null){
 					$this->addError($this->getClassName(), 'Output Field Required: '.$name);
 					return false;
 				}else{
@@ -275,6 +276,7 @@ class KernelTasksTask extends KernelObject{
 					$this->addError($this->getClassName(), 'Output Field Required: '.$name);
 					return false;
 				}else{
+					
 					if($allowList){
 						if($value instanceof KernelDataPrimitiveList){
 							$targetValue = $value;	
@@ -304,6 +306,7 @@ class KernelTasksTask extends KernelObject{
 		}
 		
 		$this->outputData[$name] = $targetValue;
+		return true;
 	}
 	
 	public function getOutputValue($name){
@@ -448,9 +451,9 @@ class KernelTasksTask extends KernelObject{
 	}
 	
 	public function getErrorCount(){
-		$errors = $this->getTaskOutput('Errors');
+		$errors = $this->getOutputValue('Errors');
 		if($errors instanceof KernelDataPrimitiveList){
-			$count = $errors->getValue('count');	
+			$count = $errors->Count();	
 		}else{
 			$count = 0;
 		}
@@ -459,8 +462,8 @@ class KernelTasksTask extends KernelObject{
 		return $count;
 	}
 	
-	public function addError($className, $message, $errorNum=null){
-		
+	public function addError($className, $message, $line=-1){
+		echo 'Error:'.$message."\n\n";
 		$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		
 		$errors = $this->getOutputValue('Errors');
@@ -472,9 +475,20 @@ class KernelTasksTask extends KernelObject{
 		$errorItem = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
 		$errorItem->setValue('Class', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $className));
 		$errorItem->setValue('Message', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $message));
+		$errorItem->setValue('Line', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $line));
 		
 		$errors->addItem($errorItem);
 		$this->setOutputValue('Errors', $errors);
+	}
+	
+	public function getTrace(){
+		return array(
+			array(
+				'time'=>time(),
+				'msg'=>$this->getClassName(),
+				'lvl'=>$level
+			)
+		);
 	}
 }
 ?>

@@ -26,21 +26,22 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 		$process = array(
 			'LocalData'=>array(
 					'ADMIN_URL'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', '/admin'),
-					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'GOTTA LOGIN BEEOTCH'),
+					'ADMIN_MESSAGE'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', '<form method="POST">username:<input type="text" name="Username"/><br/>Password<input type="password" name="Password" /><br/><input type="submit" value="Login"/></form>'),
 					'OUTPUT_HTML'=>DataClassLoader::createInstance('Kernel.Data.Primitive.String', 'No Outout Supplied')
 			),
 			'Tasks'=>array(
-				'IF1'=>'Kernel.Tasks.Logic.If',
+				'If_is_Admin_Url'=>'Kernel.Tasks.Logic.If',
 				'LoadWebsitePage'=>'Modules.Website.Tasks.LoadSimplePage',
-				'OR1'=>'Kernel.Tasks.Logic.Or',
+				'DoSiteAdmin'=>'Modules.Website.Processes.SimpleWebsiteAdmin',
+				'LoadLoginForm'=>'Modules.Website.Tasks.LoadPOSTData',
+				'IsAdmin_or_PageIsProcessed'=>'Kernel.Tasks.Logic.Or',
 				'ProcessTemplate'=>'Modules.Website.Tasks.ProcessBasicTemplate',
-				'OR2'=>'Kernel.Tasks.Logic.Or',
 				'OutputHTML'=>'Modules.Website.Tasks.SendHTMLResponse'
 			),
 			'TaskMap'=>array(
 				'LocalData'=>array(
 					'ADMIN_URL'=>array(
-						'IF1.Input1'
+						'If_is_Admin_Url.Input1'
 					),
 					'ADMIN_MESSAGE'=>array(
 						'LocalData.OUTPUT_HTML'
@@ -51,26 +52,37 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 				),
 				'Inputs'=>array(
 					'Enabled'=>array(
-						'IF1.Enabled'
+						'If_is_Admin_Url.Enabled'
 					),
 					'Domain'=>array(
 						'LoadWebsitePage.Domain'
 					),
 					'PagePath'=>array(
-						'IF1.Input2',
-						'LoadWebsitePage.PagePath'
+						'If_is_Admin_Url.Input2',
+						'LoadWebsitePage.PagePath'	
 					)
 				),
-				'IF1'=>array(
+				'If_is_Admin_Url'=>array(
 					'Failed'=>array(
 						'LoadWebsitePage.Enabled'
 					),
-					'Completed'=>array(
-						'OR1.Reset'
-					),
 					'Succeeded'=>array(
-						'OR1.Inputs'
+						'DoSiteAdmin.Enabled'
 					)
+				),
+				'LoadLoginForm'=>array(
+					'Completed'=>array(
+						'IsAdmin_or_PageIsProcessed.Reset'
+					),
+					'DataNotLoaded'=>array(
+						'IsAdmin_or_PageIsProcessed.Inputs'
+					),
+					'DataLoaded'=>array(
+						'IsAdmin_or_PageIsProcessed.Inputs'
+					)
+				),
+				'DoSiteAdmin'=>array(
+					
 				),
 				'LoadWebsitePage'=>array(
 					'Completed'=>array(
@@ -80,15 +92,15 @@ class ModulesWebsiteProcessesSimpleWebsite extends KernelProcessesProcess{
 						'ProcessTemplate.Page'
 					)
 				),
-				'OR1'=>array(
+				'IsAdmin_or_PageIsProcessed'=>array(
 					'Succeeded'=>array(
 						'OutputHTML.Enabled'
 					)
 				),
 				'ProcessTemplate'=>array(
 					'Completed'=>array(
-						'OR1.Reset',
-						'OR1.Inputs'
+						'IsAdmin_or_PageIsProcessed.Reset',
+						'IsAdmin_or_PageIsProcessed.Inputs'
 					),
 					'HTML'=>array(
 						'OutputHTML.HTMLString'

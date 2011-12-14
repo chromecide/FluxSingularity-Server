@@ -37,6 +37,7 @@ class KernelDataDataStore extends KernelObject{
 	}
 
 	public function findOne($entity, $params){
+		//print_r($entity);
 		$collectionName = $entity->collectionName;
 		$return = $this->driver->findOne($collectionName, $params);
 		return $return;

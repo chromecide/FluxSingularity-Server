@@ -66,9 +66,11 @@ class KernelTasksSecurityAuthenticateUser extends KernelTasksTask{
 		
 		$qUser = DataClassLoader::createInstance('Kernel.Data.Security.User');
 		
-		$user = $store->findOne($qUser, $conditionGroup);
+		$kernelUser = $store->findOne($qUser, $conditionGroup);
 		
 		if($user){
+			
+				
 			$this->setTaskOutput('User', $user);
 			$this->setTaskOutput('AuthenticationFailed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
 			$this->setTaskOutput('AuthenticationSucceeded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));

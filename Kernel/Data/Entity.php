@@ -49,7 +49,7 @@ class KernelDataEntity extends KernelData{
 				$this->extendClass($extend);	
 			}	
 		}else{
-			if(is_object($data) && $data->extends){
+			if(is_object($data) && property_exists($data, 'extends')){
 				foreach($data->extends as $extend){
 					$this->extendClass($extend);	
 				}	
@@ -92,15 +92,11 @@ class KernelDataEntity extends KernelData{
 		if(array_key_exists('Store', $data)){
 			$this->store = $data['Store'];
 		}
+		
 		$fields = $this->getFields();
 		
 		foreach($fields as $fieldName=>$fieldCfg){
-			
-<<<<<<< HEAD
-			if($data[$fieldName]){
-=======
 			if(array_key_exists($fieldName, $data)){
->>>>>>> Development-Main
 				if($fieldCfg instanceof KernelDataPrimitiveFieldDefinition){
 					$type = $fieldCfg->getValue('Type')->getValue();
 					$allowList = $fieldCfg->getValue('AllowList')->getValue();
@@ -128,7 +124,6 @@ class KernelDataEntity extends KernelData{
 								}
 							}
 						}else{
-							
 							$this->setValue($fieldName, DataClassLoader::createInstance($type, $data[$fieldName]));	
 						}
 					}
@@ -175,6 +170,7 @@ class KernelDataEntity extends KernelData{
 		}else{
 			if(array_key_exists($fieldName, $this->data)){
 				$value = $this->data[$fieldName];	
+				
 				if(in_array('KernelData', class_parents($value))){
 					$retValue = $value;
 				}else{
@@ -210,9 +206,9 @@ class KernelDataEntity extends KernelData{
 	 * @param $id
 	 * @param $fields
 	 */
-	function loadById($id, $fields=null){
+	function loadById($id=null, $fields=null){
 		if($id===null){
-			$id = $this->get('KernelID');
+			$id = $this->getValue('KernelID');
 		}
 		
 		if(!$id instanceof KernelDataPrimitiveString){
@@ -274,7 +270,7 @@ class KernelDataEntity extends KernelData{
 	 * @param unknown_type $params
 	 */
 	function findOne($params){		
-		$return = $this->store->findOne($this->collectionName, $params);
+		$return = $this->store->findOne($this, $params);
 		
 		return $return;
 	}
@@ -301,6 +297,7 @@ class KernelDataEntity extends KernelData{
 			return false;
 		}
 		
+		//Version
 		$kernelVersion = $this->getValue('KernelVersion');
 		
 		if($kernelVersion){
@@ -363,6 +360,7 @@ class KernelDataEntity extends KernelData{
 		$ret->KernelClass = $this->getClassName();
 		
 		foreach($this->fields as $field=>$fieldDef){
+			
 			$type = $fieldDef->getItem('Type')->getValue();
 			$required = $fieldDef->getItem('Required')->getValue();
 			$isList = $fieldDef->getItem('AllowList')->getValue();
@@ -447,6 +445,11 @@ class KernelDataEntity extends KernelData{
 		
 		//TODO: do something funky to determine how much has changed since last version
 		//in the mean time, we are gonna have HUGE revRev Numbers :-(
+		
+		//possibly something to do with the number of changed fields vs the number of total fields
+		//also think about adding a Kernel Field to allow weighting of fields as more important in
+		// terms of versioning
+		
 		$revRev++;
 		
 		$ret = implode('.', array($majorRev, $minorRev, $revRev));
@@ -516,7 +519,6 @@ class KernelDataEntity extends KernelData{
 							
 							if(!in_array('KernelData', class_parents($fieldValue))){
 								if($defaultValue!==null){
-									echo 'default value not null<br/>';
 									$this->setValue($field, $defaultValue);
 								}else{
 									$this->validationErrors[] = array('FieldRequired', $field);
@@ -528,12 +530,9 @@ class KernelDataEntity extends KernelData{
 				}
 			}
 			
-			//echo '&nbsp;&nbsp;Valid:';
 			if(!$valid){
+				//$this->addTrace($field.' - Invalid Field Value');
 				$this->validationErrors[] = array('InvalidValue', $field);
-				//echo 'FAILED<br/><br/>';
-			}else{
-				//echo 'PASSED<br/><br/>';
 			}
 		}
 		

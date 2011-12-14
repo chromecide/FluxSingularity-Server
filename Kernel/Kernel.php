@@ -1,8 +1,18 @@
 <?php
 class Kernel{
+	
+	const TRACE_LEVEL_DEBUG = 1;
+	const TRACE_LEVEL_NOTICE = 2;
+	const TRACE_LEVEL_ERROR = 3;
+	const TRACE_LEVEL_TASK = 4;
+	const TRACE_LEVEL_PROCESS = 5;
+	
+	public $trace_level = 1;
+	
 	protected $kernelStore = null;
 	
 	protected $errors = array();
+	protected $trace = array();
 	
 	public static function getMeta(){
 		$meta = $meta = new stdClass();
@@ -16,6 +26,7 @@ class Kernel{
 	}
 	
 	public function __construct($config){
+		$this->addTrace('Constructing Flux Singularity Kernel', 1);
 		date_default_timezone_set('Australia/Melbourne');
 		 
 		DataClassLoader::loadClass('Kernel.Object');
@@ -55,10 +66,16 @@ class Kernel{
 			DataClassLoader::loadClass('Kernel.Security.Permission');
 			DataClassLoader::loadClass('Kernel.Security.User');
 		
-		$this->parseConfig($config);
+		if(!$this->parseConfig($config)){
+			throw new Exception("Error Parsing Config", 1);
+		}
+		
+		$this->addTrace('Constructing Flux Singularity Kernel Complete', 1);
 	}
 	
 	public function parseConfig($config){
+		$parsed = true;
+		$this->addTrace('Parsing Configuration', 1);
 		if($config){
 			if(array_key_exists('KernelStore', $config)){
 				$this->loadKernelStore($config['KernelStore']);
@@ -67,19 +84,24 @@ class Kernel{
 			}
 	
 			if(array_key_exists('User', $config)){
-				$this->loadUser($config['User']);
+				$userAuthorised = $this->loadUser($config['User']);
+				if(!$userAuthorised){
+					$this->addError('Kernel', __LINE__, 'Invalid User Supplied');
+					$parsed = false;
+				}
+			}else{
+				//$this->addError('Kernel', __LINE__, 'No User Supplied');
+				//$parsed = false;
 			}	
 		}
-		
+		$this->addTrace('Parsing Configuration Complete', 1);
+		return $parsed;
 	}
 	
 	public function getKernelStore(){
 		return $this->kernelStore;
 	}
 	
-	public function getErrors(){
-		return $this->errors;
-	}
 	
 	public function loadKernelStore($config){
 		$store = DataClassLoader::createInstance('Kernel.Data.DataStore', $config);
@@ -96,32 +118,29 @@ class Kernel{
 		$authenticationTask->setTaskInput('Username', $userName);
 		$authenticationTask->setTaskInput('Password', $password);
 		$authenticationTask->setTaskInput('Store', $store);
-		//print_r($authenticationTask);
+		
 		$authenticationTask->enableTask();
 		
 		$authenticationTask->runTask();
 		
-		$completedObj = $authenticationTask->getTaskOutput('Completed');
-		//print_r($completedObj);
-		$completed = $completedObj->getValue();
+		$authSucceededObj = $authenticationTask->getTaskOutput('AuthenticationSucceeded');
 		
-		if($completed){
+		$authSucceeded = $authSucceededObj->getValue();
+		
+		if($authSucceeded){
 			$user = $authenticationTask->getTaskOutput('User');
-			//print_r($user);
+				
 			$this->user = $user;
+			return true;
 		}else{
-			$errored = $authenticationTask->getTaskOutput('ErrorOcurred')->getValue();
-			if($errored){
-				$errors = $authenticationTask->getTaskOutput('Errors');
-				print_r($errors);
-				echo '<br/><br/>';
-				echo 'error loading Kernel user: task did not complete1';	
-			}else{
-				echo 'error loading Kernel user: task did not complete2';
-			}
-			
+			$this->user = null;
+			return false;
 		}
 		
+	}
+	
+	public function getUser(){
+		return $this->user;
 	}
 	
 	public function runTempProcess($processCfg){
@@ -159,9 +178,12 @@ class Kernel{
 	}
 	
 	public function runTask($taskName, $inputArray=array(), $outputHTMLResults=false){
+		
+		
 		try{
 			$task = DataClassLoader::createInstance($taskName);
 		}catch (Exception $e){
+			echo $e->getMessage();
 			$this->errors[] = $e;
 			return false;
 		}
@@ -174,16 +196,20 @@ class Kernel{
 					 $inputCfg=  $inputList[$inputName];
 					//this needs to take into account an input array that is not Kernel.Data based
 					//echo $inputName.' = '.$inputValue->getValue().'<br/>';
-					if(in_array('KernelData', class_parents($inputValue))){ //Kernel.Data based
-						$task->setTaskInput($inputName, $inputValue);	
-					}else{//proabably a standard php variable
+					if(is_object($inputValue)){
+						if(in_array('KernelData', class_parents($inputValue))){ //Kernel.Data based
+							$task->setTaskInput($inputName, $inputValue);	
+						}else{//proabably a standard php variable
+							$task->setTaskInput($inputName, DataClassLoader::createInstance($inputCfg->getValue('Type')->getValue(), $inputValue));
+						}	
+					}else{
 						$task->setTaskInput($inputName, DataClassLoader::createInstance($inputCfg->getValue('Type')->getValue(), $inputValue));
-					}
-					
+					}	
 				}
 			}
 			
-			$task->runTask();
+			$task->run();
+			
 			
 			if($outputHTMLResults){
 				$this->printTaskOutputs($task);
@@ -283,5 +309,34 @@ class Kernel{
 	public function fireEvent($eventName, $parameters){
 		
 	}
+	
+	public function addError($class, $line, $message){
+		$errorItem = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
+		$errorItem->setValue('Class', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $class));
+		$errorItem->setValue('Message', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $message));
+		$errorItem->setValue('LineNumber', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $line));
+		
+		$this->errors[] = $errorItem;	
+	}
+	
+	public function getErrors(){
+		return $this->errors;
+	}
+	
+	public function addTrace($message, $level=self::TRACE_LEVEL_DEBUG){
+		
+		if($this->trace_level>=$level){
+			$this->trace[] = array(
+				'time'=>time(), 
+				'msg'=>$message,
+				'lvl'=>$level
+			);	
+		}
+	}
+	
+	public function getTrace(){
+		return $this->trace;
+	}
+	
 }
 ?>

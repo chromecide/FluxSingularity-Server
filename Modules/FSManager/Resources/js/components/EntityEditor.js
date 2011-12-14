@@ -1,4 +1,4 @@
-Ext.define('FSManager.components.ProcessEditor',{
+Ext.define('FSManager.components.EntityEditor',{
 	extend: 'Ext.container.Container',
 	uses:[
 		'FSManager.components.NodeDisplay'

@@ -1,4 +1,4 @@
-Ext.define('FSManager.components.ProcessEditor',{
+Ext.define('FSManager.components.EntityDefinitionEditor',{
 	extend: 'Ext.container.Container',
 	uses:[
 		'FSManager.components.NodeDisplay'
@@ -7,9 +7,5 @@ Ext.define('FSManager.components.ProcessEditor',{
 		this.callParent(arguments);
 		
 		this.on('render', this.initDD, this);
-	},
-	initDD: function(){
-		var thisEditor=this;
-		this.dd = new Ext.dd.DD(this.getEl(), "group1");
 	}
 })

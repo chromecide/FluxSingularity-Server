@@ -1,12 +1,13 @@
 <?php 
-class ModulesFSManagerDataSession extends KernelDataEntity{
+
+class ModulesFSManagerDataSession extends ModulesWebsiteDataSession{
 	public function __construct($data){
 		parent::__construct($data);
 		$this->collectionName = 'FSManager.Sessions';
 		
 		$this->_ClassName = 'Modules.FSManager.Data.Session';
 		$this->_ClassTitle='FSManager User Session Entity';
-		$this->_ClassDescription = 'Used to create User Sessions';
+		$this->_ClassDescription = 'Used to create FSManager User Sessions';
 		$this->_ClassAuthor = 'Justin Pradier <justin.pradier@fluxsingularity.com';
 		$this->_ClassVersion = '1.0.0';
 		

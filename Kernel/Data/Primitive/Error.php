@@ -11,5 +11,6 @@ class KernelDataPrimitiveError extends KernelDataPrimitiveNamedList{
 		
 		$this->addItem('Class', null);
 		$this->addItem('Message', null);
+		$this->addItem('Line', null);
 	}
 }

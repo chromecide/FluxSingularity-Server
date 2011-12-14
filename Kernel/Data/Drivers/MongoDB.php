@@ -74,7 +74,6 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 		
 		$res = $collection->findOne($query);
 		
-		
 		if($res){
 			$return = $this->itemToEntity($res, true);
 		}else{
@@ -338,9 +337,9 @@ class KernelDataDriversMongoDB extends KernelDataDatabaseDriver{
 				$extendedClassFields = $extendedClass->getFields();
 				foreach($extendedClassFields as $extendedFieldName=>$extendedFieldCfg){
 					if(strpos($extendedFieldName, 'Kernel')!==0){
-						echo 'processing extend field: '. $extendedClass->getClassName().'::'.$extendedFieldName.'<br/>';
+						//echo 'processing extend field: '. $extendedClass->getClassName().'::'.$extendedFieldName.'<br/>';
 						$extendedClass->setValue($extendedFieldName, $entity->getValue($extendedFieldName));
-						$extendedFields[$extendedFieldName] = true;
+						//$extendedFields[$extendedFieldName] = true;
 					}	
 				}
 				$object->KernelExtends[$extendedClassName] = $extendedClass->getEntityReference();

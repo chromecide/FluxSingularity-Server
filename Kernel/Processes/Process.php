@@ -394,6 +394,7 @@ class KernelProcessesProcess extends KernelObject{
 	 * Token Table Functions
 	 */
 	public function setTokenValue($taskName, $attributeName, $value){
+		
 		$allowList = false;
 		
 		if(!array_key_exists($taskName, $this->tokenTable)){
@@ -437,7 +438,7 @@ class KernelProcessesProcess extends KernelObject{
 		
 		
 		if($attributeName=='Enabled' || $attributeName=='Reset'){
-			
+				
 			$setValue = $value->getValue();
 			
 			if($value->getValue()==true){
@@ -445,7 +446,6 @@ class KernelProcessesProcess extends KernelObject{
 			}
 			
 			if($attributeName=='Reset'){
-				
 				$task = $this->tasks[$taskName];
 				
 				$task->resetTask();
@@ -552,7 +552,7 @@ class KernelProcessesProcess extends KernelObject{
 					$allSet = true;
 					foreach($taskTokens as $attributeName=>$tokens){
 						if($attributeName!='Reset'){
-							$this->addTrace('				:. '. $attributeName);
+							$this->addTrace('				: '. $attributeName);
 							
 							if(is_array($tokens)){
 								foreach($tokens as $token){
@@ -652,7 +652,9 @@ class KernelProcessesProcess extends KernelObject{
 		$inputs = $this->taskMap['Inputs'];
 		
 		foreach($inputs as $inputName=>$mappings){
+			
 			$itemData = $this->getInputValue($inputName);
+			
 			foreach($mappings as $mapping){
 				$parts = explode('.', $mapping);
 				$this->addTrace('	Setting Token: '.$mapping);
@@ -660,19 +662,22 @@ class KernelProcessesProcess extends KernelObject{
 				$this->setTokenValue($parts[0], $parts[1], $itemData);
 			}
 		}
-
-		$localData = $this->taskMap['LocalData'];
 		
-		foreach($localData as $inputName=>$mappings){
-			
-			$itemData = $this->getLocalDataValue($inputName);
-			$this->setTokenValue('LocalData', $inputName, $itemData);
-			foreach($mappings as $mapping){
-				$parts = explode('.', $mapping);
-				$this->addTrace('	Setting Token: LocalData.'.$inputName.' => '.$mapping);
-				$this->setTokenValue($parts[0], $parts[1], $itemData);
-			}
+		if(array_key_exists('LocalData', $this->taskMap)){
+			$localData = $this->taskMap['LocalData'];
+		
+			foreach($localData as $inputName=>$mappings){
+				
+				$itemData = $this->getLocalDataValue($inputName);
+				$this->setTokenValue('LocalData', $inputName, $itemData);
+				foreach($mappings as $mapping){
+					$parts = explode('.', $mapping);
+					$this->addTrace('	Setting Token: LocalData.'.$inputName.' => '.$mapping);
+					$this->setTokenValue($parts[0], $parts[1], $itemData);
+				}
+			}	
 		}
+		
 		
 		$this->addTrace('	Seeding Token Table Complete');
 		
@@ -748,9 +753,23 @@ class KernelProcessesProcess extends KernelObject{
 				$this->addTrace('		Task Run Complete');
 				$this->transferTaskTokens($taskName);
 			}else{
-				//print_r($task->getOutputValue('Errors'));
-				$this->addTrace('		Task "Run" returned False');
+				
+				$this->addTrace('		'.$taskName.': "Run" returned False');
+				
+				$processTrace = $task->getTrace();
+				$this->trace = array_merge($this->trace, $processTrace);
+				
+				$taskErrors = $task->getOutputValue('Errors');
+				$errorCount = $taskErrors->Count();
+				
+				for($x=0;$x<$errorCount;$x++){
+					$item = $taskErrors->getItem($x);
+					$this->addTaskError($item);	
+				}
+				
+				$this->addTrace('		Added '.$errorCount.' errors');
 			}
+			
 			$this->completedTasks[$taskName] = true;
 		}	
 		
@@ -775,15 +794,31 @@ class KernelProcessesProcess extends KernelObject{
 		$errorItem = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
 		$errorItem->setValue('Class', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $this->getClassName()));
 		$errorItem->setValue('Message', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $message));
-		$errorItem->setValue('LineNumber', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $lineNumber));
+		$errorItem->setValue('Line', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $lineNumber));
 		
 		$errors->addItem($errorItem);
 		$this->addTrace($message.'(Line '.$lineNumber.')', self::TRACE_LEVEL_ERROR);
 		$this->setOutputValue('Errors', $errors);
 	}
+
+	public function addTaskError($errorItem){
+		$errors = $this->getOutputValue('Errors');
+		
+		if(!($errors instanceof KernelDataPrimitiveList)){
+			$errors = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+		}
+		
+		$errors->addItem($errorItem);
+		$class = $errorItem->getValue('Class');
+		$message = $errorItem->getValue('Message');
+		$lineNumber = $errorItem->getValue('Line');
+		
+		$this->addTrace($message->getValue().'('.$class->getValue().' - Line '.$lineNumber->getValue().')', self::TRACE_LEVEL_TASK);
+		$this->setOutputValue('Errors', $errors);
+	}
 	
 	public function addTrace($message, $level=self::TRACE_LEVEL_DEBUG){
-		
+		echo $message."\n";
 		if($this->trace_level>=$level){
 			$this->trace[] = array(
 				'time'=>time(), 

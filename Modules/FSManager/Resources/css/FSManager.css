@@ -1,9 +1,35 @@
 .FSManagerNode{
-	background-color: #cccccc;	
+	background-color: transparent;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+}
+
+.FSManagerInputPanel{
+	padding-left: 15px;
+	background-color:transparent;
 }
 
 .FSManagerNodeInput{
 	background-color: #0000FF;
+	float:left;
+	width: 15px;
+	margin-right: 2px;
+	margin-top:1px;
+}
+
+.FSManagerNodeInfo{
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	padding-left: 10px;
+}
+
+.FSManagerOutputPanel{
+	padding-left: 15px;
+	background-color:transparent;
+}
+
+.FSManagerNodeOutput{
+	background-color: #FF0000;
 	float:left;
 	width: 15px;
 	margin-right: 2px;

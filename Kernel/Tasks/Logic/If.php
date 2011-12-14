@@ -31,6 +31,7 @@ class KernelTasksLogicIf extends KernelTasksTask{
 		
 		$input1Obj = $this->getInputValue('Input1');
 		$input2Obj = $this->getInputValue('Input2');
+		
 		$operatorObj = $this->getInputValue('Operator');
 		
 		$input1 = $input1Obj->getValue();

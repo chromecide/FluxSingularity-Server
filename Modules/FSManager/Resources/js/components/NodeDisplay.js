@@ -5,8 +5,7 @@ Ext.define('FSManager.components.NodeDisplay', {
 	],
 	width:200,
 	height:100,
-	x:200,
-	y: 100,
+	border:false,
 	layout:{
 		type:'vbox',
 		align:'stretch',
@@ -14,7 +13,9 @@ Ext.define('FSManager.components.NodeDisplay', {
 	items:[
 		{
 			xtype:'panel',
+			border:false,
 			flex:1,
+			bodyCls: 'FSManagerInputPanel',
 			items:[
 				{
 					xtype:'dataview',
@@ -22,26 +23,53 @@ Ext.define('FSManager.components.NodeDisplay', {
 					store: Ext.create('Ext.data.Store', {
 						model: 'FSManager.models.NodeInput',
 						data:[
-							{Title:'Test', 'Type': 'Test2'}
-						]
+							{Title:'Input 1', 'Type': 'Kernel.Data.Primitive.String'}
+						],
+						proxy:{
+							type: 'memory',
+					        reader: {
+					            type: 'json'
+					        }
+						}
 					})
 				}
 			]
 		},
 		{
 			xtype:'panel',
+			bodyCls: 'FSManagerNodeInfo',
 			html:'Information',
+			//border:false,
 			flex:4
 		},
 		{
 			xtype:'panel',
-			html:'Outputs',
-			flex:1
-		}
+			border:false,
+			flex:1,
+			bodyCls: 'FSManagerOutputPanel',
+			items:[
+				{
+					xtype:'dataview',
+					tpl: '<div class="FSManagerNodeOutput">&nbsp;</div>',
+					store: Ext.create('Ext.data.Store', {
+						model: 'FSManager.models.NodeInput',
+						data:[
+							{Title:'Completed', 'Type': 'Kernel.Data.Primitive.Boolean'}
+						],
+						proxy:{
+							type: 'memory',
+					        reader: {
+					            type: 'json'
+					        }
+						}
+					})
+				}
+			]
+		},
 	],
 	constructor: function(){
 		this.bodyCls = 'FSManagerNode';
-		//this.html = 'AND';
+		this.borders=false;
 		this.callParent(arguments);
 		
 		//this.on('render', this.initDD, this);

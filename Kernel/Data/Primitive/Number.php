@@ -19,7 +19,6 @@ class KernelDataPrimitiveNumber extends KernelDataPrimitive{
 	}
 	
 	public function setValue($value){
-		echo 'setting value<br/>';
 		if(is_numeric($value)){
 			$this->data = $value;
 			return true;

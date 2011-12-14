@@ -16,6 +16,8 @@ class ModulesWebsiteDataSession extends KernelDataEntity{
 		$this->fields['User'] = DataClassLoader::createInstance('Kernel.Data.Primitive.FieldDefinition', array('Name'=>'User', 'Type'=>'Kernel.Data.Security.User', 'Required'=>false, 'AllowList'=>false));
 		
 		$this->loadData($data);
+		$this->setValue('KernelID', DataClassLoader::createInstance('Kernel.Data.Primitive.String', session_id()));
+		$this->setValue('SessionID', DataClassLoader::createInstance('Kernel.Data.Primitive.String', session_id()));
 	}
 }
 ?>

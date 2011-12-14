@@ -16,42 +16,45 @@ class KernelDataPrimitiveTaskOutput extends KernelDataPrimitiveNamedList{
 		$this->setValue('Required', 		DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean',false));
 		$this->setValue('AllowList', 		DataClassLoader::createInstance('Kernel.DataPrimitive.Boolean', false));
 		$this->setValue('DefaultValue', 	DataClassLoader::createInstance('Kernel.Data.Primitive.String'));
+		
+		$this->loadData($data);
 	}
 	
 	public function loadData($cfg){
-		if($cfg['Name']){
+		
+		if(array_key_exists('Name', $cfg)){
 			$name = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $cfg['Name']);
 			$this->setValue('Name', 	$name);
 		}
 		
-		if($cfg['Type']){
+		if(array_key_exists('Type', $cfg)){
 			$type = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $cfg['Type']);
 			$this->setValue('Type', 	$type);
 		}
 		
-		if($cfg['Required']){
+		if(array_key_exists('Required', $cfg)){
 			$required = DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $cfg['Required']);
 			$this->setValue('Required', $required);
 		}
 		
-		if($cfg['AllowList']){
+		if(array_key_exists('AllowList', $cfg)){
 			$allowList = DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', $cfg['AllowList']);
 			$this->setValue('AllowList', $allowList);
 		}
 		
-		if($cfg['DefaultValue']){
+		if(array_key_exists('DefaultValue', $cfg)){
 			$rawValue = $cfg['DefaultValue'];
 			if(is_object($rawValue)){
 				if(in_array('KernelData', class_parents($cfg['DefaultValue']))){
 					$defaultValue = $rawValue;		
 				}else{
-					$defaultValue = DataClassLoader::createInstance($this->getItem('Type'), $rawValue);
+					$defaultValue = DataClassLoader::createInstance($this->getItem('Type')->getValue(), $rawValue);
 				}
 			}else{
-				$defaultValue = DataClassLoader::createInstance($this->getItem('Type'), $rawValue);
+				$defaultValue = DataClassLoader::createInstance($this->getItem('Type')->getValue(), $rawValue);
 			}
 			
 			$this->setValue('DefaultValue', $defaultValue);
-		}	
+		}
 	}
 }
