@@ -19,6 +19,8 @@ class KernelTasksDataListGetItem extends KernelTasksTask{
 		$this->inputs['Index'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskInput', array('Name'=>'List Index', 'Type'=>'Kernel.Data.Primitive.Number', 'Required'=>true, 'AllowList'=>false));
 		
 		$this->outputs['Item'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'List Item', 'Type'=>'Kernel.Data'));
+		$this->outputs['ItemLoaded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'List Item', 'Type'=>'Kernel.Data'));
+		$this->outputs['ItemNotLoaded'] = DataClassLoader::createInstance('Kernel.Data.Primitive.TaskOutput', array('Name'=>'List Item', 'Type'=>'Kernel.Data'));
 	}
 	
 	public function run(){
@@ -29,8 +31,12 @@ class KernelTasksDataListGetItem extends KernelTasksTask{
 		$inputList = $this->getInputValue('List');
 		$inputIndex = $this->getInputValue('Index');
 		if($inputList instanceof KernelDataPrimitiveList){
-			echo 'getting item';
 			$this->setOutputValue('Item', $inputList->getItem());
+			$this->setOutputValue('ItemLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
+			$this->setOutputValue('ItemNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+		}else{
+			$this->setOutputValue('ItemLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+			$this->setOutputValue('ItemNotLoaded', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		}
 		
 		return $this->completeTask();

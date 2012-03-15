@@ -1,342 +1,306 @@
 <?php
+require_once('Object.php');
+require_once('ObjectDefinitionField.php');
+require_once('DataDriver.php');
+require_once('Action.php');
+date_default_timezone_set('UTC');
+
 class Kernel{
+	private static $instance = null;
 	
-	const TRACE_LEVEL_DEBUG = 1;
-	const TRACE_LEVEL_NOTICE = 2;
-	const TRACE_LEVEL_ERROR = 3;
-	const TRACE_LEVEL_TASK = 4;
-	const TRACE_LEVEL_PROCESS = 5;
+	protected $kernelPath = '../';
+	protected $driver = null;
 	
-	public $trace_level = 1;
+	public $numObjects = 0;
 	
-	protected $kernelStore = null;
-	
-	protected $errors = array();
-	protected $trace = array();
-	
-	public static function getMeta(){
-		$meta = $meta = new stdClass();
-		$meta->Name = 'Kernel';
-		$meta->Title = 'Core Kernel Object';
-		$meta->Description = 'Provides the Core Entry Point for Flux Singularity';
-		$meta->Author = 'Justin Pradier';
-		$meta->Version = '0.4.0';
-		
-		return $meta;
-	}
-	
-	public function __construct($config){
-		$this->addTrace('Constructing Flux Singularity Kernel', 1);
-		date_default_timezone_set('Australia/Melbourne');
-		 
-		DataClassLoader::loadClass('Kernel.Object');
-		
-		//Data
-		DataClassLoader::loadClass('Kernel.Data');
-		DataClassLoader::loadClass('Kernel.Data.Primitive');
-			//Primitives
-				DataClassLoader::loadClass('Kernel.Data.Primitive.NamedList');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.Boolean');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.Condition');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.DateTime');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.FieldDefinition');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.List');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.Number');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.String');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.TaskCondition');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.TaskInput');
-				DataClassLoader::loadClass('Kernel.Data.Primitive.TaskOutput');
-				
-			//Data Store Drivers
-			DataClassLoader::loadClass('Kernel.Data.Database');
-			DataClassLoader::loadClass('Kernel.Data.DatabaseDriver');
-		
-		
-			DataClassLoader::loadClass('Kernel.Data.Entity');
-			
-			//Tasks
-			DataClassLoader::loadClass('Kernel.Tasks.Task');
-			//Events
-			DataClassLoader::loadClass('Kernel.Events.Event');
-			//Process
-			DataClassLoader::loadClass('Kernel.Processes.Process');
-			
-			//Security
-			DataClassLoader::loadClass('Kernel.Security.Circle');
-			DataClassLoader::loadClass('Kernel.Security.Permission');
-			DataClassLoader::loadClass('Kernel.Security.User');
-		
-		if(!$this->parseConfig($config)){
-			throw new Exception("Error Parsing Config", 1);
-		}
-		
-		$this->addTrace('Constructing Flux Singularity Kernel Complete', 1);
-	}
-	
-	public function parseConfig($config){
-		$parsed = true;
-		$this->addTrace('Parsing Configuration', 1);
+	public function __construct($config=null){
 		if($config){
-			if(array_key_exists('KernelStore', $config)){
-				$this->loadKernelStore($config['KernelStore']);
-				KernelDataEntity::$kernelStore = $this->getKernelStore();
-				KernelTasksTask::$kernelStore = $this->getKernelStore();
+			if(array_key_exists('KernelPath', $config)){
+				$this->kernelPath = $config['KernelPath'];
 			}
-	
-			if(array_key_exists('User', $config)){
-				$userAuthorised = $this->loadUser($config['User']);
-				if(!$userAuthorised){
-					$this->addError('Kernel', __LINE__, 'Invalid User Supplied');
-					$parsed = false;
-				}
-			}else{
-				//$this->addError('Kernel', __LINE__, 'No User Supplied');
-				//$parsed = false;
-			}	
+			
+			if(array_key_exists('KernelUserName', $config)){
+				$this->kernelUserName = $config['KernelUserName'];
+			}
+			
+			if(array_key_exists('KernelPassword', $config)){
+				$this->kernelPassword = $config['KernelPassword'];
+			}
 		}
-		$this->addTrace('Parsing Configuration Complete', 1);
-		return $parsed;
 	}
 	
-	public function getKernelStore(){
-		return $this->kernelStore;
+	public static function singleton($cfg=null){
+		if(!isset(self::$instance)){
+			self::$instance = new Kernel($cfg);
+		}
+		
+		return self::$instance;
 	}
 	
-	
-	public function loadKernelStore($config){
-		$store = DataClassLoader::createInstance('Kernel.Data.DataStore', $config);
-		$this->kernelStore = $store;
-	}
-	
-	public function loadUser($config){
-		$authenticationTask = DataClassLoader::createinstance('Kernel.Tasks.Security.AuthenticateUser');
+	public function setDataDriver($config){
+		$driver = KernelDataDriver::load($config);
+		$driver->connect();
 		
-		$userName = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $config['Username']);
-		$password = DataClassLoader::createInstance('Kernel.Data.Primitive.String', $config['Password']);
-		$store = $this->getKernelStore();
-		
-		$authenticationTask->setTaskInput('Username', $userName);
-		$authenticationTask->setTaskInput('Password', $password);
-		$authenticationTask->setTaskInput('Store', $store);
-		
-		$authenticationTask->enableTask();
-		
-		$authenticationTask->runTask();
-		
-		$authSucceededObj = $authenticationTask->getTaskOutput('AuthenticationSucceeded');
-		
-		$authSucceeded = $authSucceededObj->getValue();
-		
-		if($authSucceeded){
-			$user = $authenticationTask->getTaskOutput('User');
-				
-			$this->user = $user;
+		if($driver && $driver->isConnected()){
+			$this->driver = $driver;
+			KernelObject::$_DataDriver = $driver;
 			return true;
 		}else{
-			$this->user = null;
-			return false;
+			return false;	
 		}
-		
 	}
 	
-	public function getUser(){
-		return $this->user;
+	public static function createObject($config){
+		//$numObjects++;
+		$returnObject = new KernelObject($config);
+		
+		return $returnObject;	
 	}
 	
-	public function runTempProcess($processCfg){
-		//print_r($processCfg);
-		$process = DataClassLoader::createInstance('Kernel.Processes.Process', $processCfg);
-		$process->run();
-		return $process;	
-	}
-	
-	public function runProcess($processName, $inputArray=array(), $outputHTMLResults=false){
+	public function runAction($actionName, &$object){
 		
-		try{
-			$process = DataClassLoader::createInstance($processName, $inputArray);
-		}catch (Exception $e){
-			echo 'Error Loading Class<br/><br/>';
-			$this->errors[] = $e;
-			return false;
-		}
+		$filePath = $this->kernelPath.'/'.str_replace('.', '/', $actionName).'.php';
 		
-		/*if($process){
-			if($inputArray && is_array($inputArray) && count($inputArray)>0){
-				foreach($inputArray as $inputName=>$inputValue){
-					$process->setProcessInput($inputName, $inputValue);
-				}
-			}
-		}*/
+		include_once($filePath);
 		
-		$results = $process->run();
+		$className = str_replace('.', '', $actionName);
 		
-		if($outputHTMLResults){
+		if(class_exists($className)){
+			$action = new $className();
 			
-		}
-		
-		return $process;
-	}
-	
-	public function runTask($taskName, $inputArray=array(), $outputHTMLResults=false){
-		
-		
-		try{
-			$task = DataClassLoader::createInstance($taskName);
-		}catch (Exception $e){
-			echo $e->getMessage();
-			$this->errors[] = $e;
-			return false;
-		}
-		
-		
-		if($task){
-			if($inputArray && is_array($inputArray) && count($inputArray)>0){
-				$inputList = $task->getInputList();
-				foreach($inputArray as $inputName=>$inputValue){
-					 $inputCfg=  $inputList[$inputName];
-					//this needs to take into account an input array that is not Kernel.Data based
-					//echo $inputName.' = '.$inputValue->getValue().'<br/>';
-					if(is_object($inputValue)){
-						if(in_array('KernelData', class_parents($inputValue))){ //Kernel.Data based
-							$task->setTaskInput($inputName, $inputValue);	
-						}else{//proabably a standard php variable
-							$task->setTaskInput($inputName, DataClassLoader::createInstance($inputCfg->getValue('Type')->getValue(), $inputValue));
-						}	
-					}else{
-						$task->setTaskInput($inputName, DataClassLoader::createInstance($inputCfg->getValue('Type')->getValue(), $inputValue));
-					}	
-				}
-			}
+			$executed =  $action->run($object);
 			
-			$task->run();
-			
-			
-			if($outputHTMLResults){
-				$this->printTaskOutputs($task);
-			}
-			
-			return $task;
+			return $executed;
 		}else{
-			echo 'Could not create class';
+			return false;
 		}
 	}
 	
-	public function printTaskOutputs($task){
-		$taskParams = $task->getInputList();
-		echo '<h3>Running Task: '.$task->getClassName().'</h3>';
-		echo '<table width="100%"><tr><th>Inputs</th><th>Outputs</th></tr>';
-		echo '<tr><td valign="top">';
-		echo '<table width="100%" border="1"><tr><th>Input Name</th><th>Input Value</th></tr>';
-		foreach($taskParams as $paramName=>$paramCfg){
-			$paramValue = $task->getTaskInput($paramName);
-			echo '<tr>';
-			echo '<td>';
-			echo $paramName;
-			echo '</td>';
-			echo '<td>';
+	public function loadAction($actionName){
+		
+		$filePath = $this->kernelPath.'/'.str_replace('.', '/', $actionName).'.php';
+		
+		include_once($filePath);
+		
+		$className = str_replace('.', '', $actionName);
+		
+		if(class_exists($className)){
+			$action = new $className();
 			
-			if($paramValue && is_object($paramValue)){
-				$className = $paramValue->getClassName();
-				switch($className){
-					case 'Kernel.Data.Primitive.Boolean';
-						$rawValue = $paramValue->getValue();
-						if($rawValue===true){
-							echo 'True';
-						}else{
-							echo 'False';
-						}
-						break;
-					case 'Kernel.Data.Primitive.List':
-						echo $paramValue->toJSON();
-						break;
-					case 'Kernel.Data.DataStore':
-						echo 'Supplied';
-						break;
-					default:
-						echo $paramValue->getValue();
-						break;
-				}
-			}
-			echo '</td>';
-			echo '</tr>';
+			return $action;
+		}else{
+			return false;
 		}
-		echo '</table>';
-		echo '</td><td valign="top">';
-		echo '<table width="100%" border="1"><tr><th>Output Name</th><th>Output Value</th></tr>';
-		$taskOutputs = $task->getOutputList();
-		foreach($taskOutputs as $outputName=>$outputCfg){
+	}
+	
+	public static function createDefinition($name, $description, $fields){
+		$returnObj = new KernelObjectDefinition();
+	}
+	
+	public function getDefinitionList($object){
+		if(!$object->getValue('_QueryType')){
+			$object->setValue('_QueryType', 'Definition');
+		}
+		
+		return $object->find();
+	}
+	
+	public static function runTask(){
+		
+	}
+	
+	public static function runProcess(){
+		
+	}
+	
+	public function requireModule($moduleName, $autoInstall=false){
+		$installed = false;
+		$path = $this->kernelPath.'/'.str_replace('.', '/', $moduleName);
+		if(is_dir($path)){
+			//see if we can load the module information from the db
+			$query = new KernelObject();
+			$query->setValue('_QueryType','Modules');
+			$query->setValue('Name', $moduleName);
 			
-			$outputValue = $task->getTaskOutput($outputName);
-			echo '<tr>';
-			echo '<td valign="top">';
-			echo $outputName;
-			echo '</td>';
-			echo '<td style="overflow:auto;">';
-			
-			if($outputValue){
-				$className = $outputValue->getClassName();
+			if($query->findOne()){
+				$installed = true;
+			}else{
 				
-				switch($className){
-					case 'Kernel.Data.Primitive.Boolean';
-						$rawValue = $outputValue->getValue();
-						if($rawValue===true){
-							echo 'True';
-						}else{
-							echo 'False';
-						}
-						break;
-					case 'Kernel.Data.Primitive.List':
-						echo $outputValue->toJSON();
-						break;
-					default:
-						if(in_array('KernelDataEntity', class_parents($outputValue))){
-							echo $outputValue->getValue('KernelName')->getValue();
-							//print_r($outputValue->getValue('KernelName'));
-						}else{
-							echo $outputValue->getValue();	
-						}
-						break;
+				if($autoInstall){
+					//attempt an install
+					include_once($path.'/install.php');
+					$moduleInstallerClass = str_replace('.', '', $moduleName).'Install';
+					$installer = new $moduleInstallerClass();
+					
+					$installed = $installer->installModule();
+				}else{
+					$installed = false;
 				}
+				
 			}
-			echo '</td>';
-			echo '</tr>';
 		}
-		echo '</table>';
-		echo '</td></tr>';
-		echo '</table>';
-	}
-	
-	public function fireEvent($eventName, $parameters){
 		
+		return $installed;
 	}
 	
-	public function addError($class, $line, $message){
-		$errorItem = DataClassLoader::createInstance('Kernel.Data.Primitive.Error');
-		$errorItem->setValue('Class', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $class));
-		$errorItem->setValue('Message', DataClassLoader::createInstance('Kernel.Data.Primitive.String', $message));
-		$errorItem->setValue('LineNumber', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $line));
+	public function installCoreObjects(){
+		//Kernel Definitions
+		/*
+		 * 'Kernel.Object',
+		'Kernel.Definition',
+		'Kernel.Process',
+		'Kernel.Event',
+		'Kernel.Action',
+		'Kernel.Object.String',
+		'Kernel.Object.Number',
+		'Kernel.Object.Boolean',
+		'Kernel.Object.Date',
+		'Kernel.Module',
+		'Kernel.Object.User',
+		'Kernel.Object.Network',
+		'Kernel.Object.Permission'
+		 */
+			//Kernel.Object
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2f5a109cd838589db8fd');
+			$object->addDefinition('Kernel.Definition');
+			
+			$object->setObjectName('Kernel.Object');
+			$object->setObjectDescription('This is the base object that all other objects within Flux Singularity are based on');
+			$object->save();
+			
+			//Kernel.Definition
+			/*
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2fe3109cd838589db8fe');
+			$object->addDefinition('Kernel.Definition');
+			$object->save();
+			*/
+			//Kernel.Event
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2ff0109cd838589db8ff');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Event');
+			$object->setObjectDescription('Object Event Definition');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			
+			$object->addField('Event', 'Kernel.Object.String', true, false);
+			$object->addField('TargetDefinition', 'Kernel.Object.String', true, false);
+			$object->addField('Conditions', 'Kernel.Object', false, true);
+			$object->addField('Actions', 'Kernel.Object.String', true, true, false);
+			
+			if(!$object->save()){
+				print_r($object);
+			}
+			
+			//Kernel.Action
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2ff8109cd838589db900');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Action');
+			$object->setObjectDescription('Action Definition');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('Status', 'Kernel.Object.String', true, false);
+			$object->addEvent('BeforeRun', 'Kernel.Action');
+			$object->addEvent('AfterRun', 'Kernel.Action');
+			
+			if(!$object->save()){
+				print_r($object);
+			}
+			
+			//Kernel.Query
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2ff8109cd838589db907');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Query');
+			$object->setObjectDescription('Query Definition');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('Type', 'Kernel.Object.String');
+			$object->setValue('Type', 'AND');
+			$object->addField('Conditions', 'Kernel.Condition', false, true, false);
+			$object->addField('Results', 'Kernel.Object', false, true, false);
+			$object->save();
+			
+			//Kernel.Condition
+			$object = new KernelObject();
+			$object->setObjectId('4f3f2ff8109cd838589db908');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Condition');
+			$object->setObjectDescription('Condition Definition');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('FieldName', 'Kernel.Object.String');
+			$object->addField('Operator', 'Kernel.Object.String');
+			$object->addField('Value', 'Kernel.Object', false, true);
+			$object->save();
+			
+			//Kernel.Module
+			$object = new KernelObject();
+			$object->setObjectId('4f3f3008109cd838589db901');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Module');
+			$object->setObjectDescription('System Module Definition');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('ActionList', 'Kernel.Object.String', false, true);
+			$object->addField('DefinitionList', 'Kernel.Object.String', false, true);
+			$object->save();
+			
+			//Kernel.Object.User
+			$object = new KernelObject();
+			$object->setObjectId('4f3f3008109cd838589db902');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Object.User');
+			$object->setObjectName('Kernel.Object.User');
+			$object->setObjectDescription('Security User Object');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('Username', 'Kernel.Object.String', true, false);
+			$object->addField('Password', 'Kernel.Object.String', true, false);
+			$object->addField('DisplayName', 'Kernel.Object.String', true, false, true, 'Display Name');
+			$object->addField('Networks', 'Kernel.Object.Network', false, true, false);
+			$object->addEvent('LoggedIn', 'Kernel.Object.User');
+			$object->addEvent('LoggedOut', 'Kernel.Object.User');
+			$object->save();
+			
+			//Kernel.Object.Network
+			$object = new KernelObject();
+			$object->setObjectId('4f3f3008109cd838589db903');
+			$object->addDefinition('Kernel.Definition');
+			$object->setObjectName('Kernel.Object.Network');
+			$object->setObjectDescription('Basic User Network used for Security');
+			$object->setObjectVersion('1.0.0');
+			$object->setObjectAuthor('Justin Pradier');
+			$object->addField('Users', 'Kernel.Object.User', false, true, false);
+			$object->addField('Networks', 'Kernel.Object.Network', false, true, false);
+			
+			$object->save();
+			
+		//Kernel Actions
 		
-		$this->errors[] = $errorItem;	
+			$object = $this->loadAction('Kernel.Actions.CreateObject');
+			$object->setObjectId('4f3f3008109cd838589db904');
+			$object->addDefinition('Kernel.Definition');
+			if(!$object->save()){
+				print_r($object->getObjectErrors());
+			}
+			
+			$object = $this->loadAction('Kernel.Actions.Stop');
+			$object->setObjectId('4f3f3008109cd838589db905');
+			$object->addDefinition('Kernel.Definition');
+			$object->save();
+			
+			$object = $this->loadAction('Kernel.Actions.FireEvent');
+			$object->setObjectId('4f3f3008109cd838589db906');
+			$object->addDefinition('Kernel.Definition');
+			$object->save();
+			
+					
+		//Kernel Events
 	}
-	
-	public function getErrors(){
-		return $this->errors;
-	}
-	
-	public function addTrace($message, $level=self::TRACE_LEVEL_DEBUG){
-		
-		if($this->trace_level>=$level){
-			$this->trace[] = array(
-				'time'=>time(), 
-				'msg'=>$message,
-				'lvl'=>$level
-			);	
-		}
-	}
-	
-	public function getTrace(){
-		return $this->trace;
-	}
-	
 }
+
 ?>

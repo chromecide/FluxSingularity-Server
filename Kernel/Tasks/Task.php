@@ -46,6 +46,7 @@ class KernelTasksTask extends KernelObject{
 	protected $inputData = array();
 	protected $outputData = array();
 	
+	protected $trace = array();
 	
 	public function __construct($data){
 		parent::__construct($data);
@@ -186,7 +187,6 @@ class KernelTasksTask extends KernelObject{
 						}
 						$targetValue->addItem($value);
 					}else{
-						
 						try{
 							$targetValue = $value;
 						}catch(Exception $e){
@@ -375,7 +375,6 @@ class KernelTasksTask extends KernelObject{
 		$inputs = $this->getInputList();
 		
 		foreach($inputs as $inputName=>$inputCfg){
-			
 			$typeObj = $inputCfg->getValue('Type');
 			$requiredObj = $inputCfg->getValue('Required');
 			$canBeListObj = $inputCfg->getValue('AllowList');
@@ -395,14 +394,13 @@ class KernelTasksTask extends KernelObject{
 			
 			if($inputValue){
 				if($canBeList){
+					//print_r($inputValue);
 					if($inputValue instanceof KernelDataPrimitiveList){
 						
 					}else{
-						
 						$this->addError($this->getClassName(), $inputName.' requires an Input with the Type of '.$type.'; A '.$inputValue->getClassName().' was supplied.');
 					}
 				}else{
-					
 					if($inputValue->getClassName()!=$type){
 						
 						$classNames = class_parents($inputValue);
@@ -463,7 +461,7 @@ class KernelTasksTask extends KernelObject{
 	}
 	
 	public function addError($className, $message, $line=-1){
-		echo 'Error:'.$message."\n\n";
+		//echo 'Error:'.$message."\n\n";
 		$this->setOutputValue('ErrorOcurred', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
 		
 		$errors = $this->getOutputValue('Errors');
@@ -481,14 +479,19 @@ class KernelTasksTask extends KernelObject{
 		$this->setOutputValue('Errors', $errors);
 	}
 	
-	public function getTrace(){
-		return array(
-			array(
-				'time'=>time(),
-				'msg'=>$this->getClassName(),
+	public function addTrace($message, $level=self::TRACE_LEVEL_DEBUG){
+		//echo $message."\n";
+		if($this->trace_level>=$level){
+			$this->trace[] = array(
+				'time'=>time(), 
+				'msg'=>$message,
 				'lvl'=>$level
-			)
-		);
+			);	
+		}
+	}
+	
+	public function getTrace(){
+		return $this->trace;
 	}
 }
 ?>

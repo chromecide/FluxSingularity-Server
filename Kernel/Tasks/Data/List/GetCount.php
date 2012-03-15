@@ -28,9 +28,9 @@ class KernelTasksDataListGetCount extends KernelTasksTask{
 		$inputList = $this->getInputValue('List');
 		
 		if($inputList instanceof KernelDataPrimitiveList){
-			$this->setOutputValue('Count', $inputList->Count());
+			$this->setOutputValue('Count', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', $inputList->Count()));
 		}else{
-			$this->setOutputValue('Count', DataClassLoader::createInstance('Kernel.Data.Primitive.List', 0));
+			$this->setOutputValue('Count', DataClassLoader::createInstance('Kernel.Data.Primitive.Number', 0));
 		}
 		
 		return $this->completeTask();

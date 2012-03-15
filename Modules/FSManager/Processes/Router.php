@@ -36,6 +36,11 @@ class ModulesFSManagerProcessesRouter extends KernelProcessesProcess{
 					'Messages'=>array(
 						'RouteClientMessages.Messages'
 					)
+				),
+				'RouteClientMessages'=>array(
+					'Completed'=>array(
+						'Outputs.Completed'
+					)
 				)
 			)
 		);

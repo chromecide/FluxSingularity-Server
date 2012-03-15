@@ -28,7 +28,7 @@ class KernelProcessesProcess extends KernelObject{
 	protected $completedTasks = array();
 	
 	protected $numLoops = 0;
-	protected $maxLoops = 1000000;
+	protected $maxLoops = 100;
 	
 	protected $processComplete = false;
 	protected $trace = array();
@@ -126,13 +126,16 @@ class KernelProcessesProcess extends KernelObject{
 	public function parseTaskMap($definition){
 		$parsed = true;
 		$this->addTrace('	Parsing Task Map Definition');
+		$this->addTrace('	  Generating Reverse Mapping');
 		foreach($definition as $sourceTaskName=>$attributes){
+			$this->addTrace("\t\t\t\t-$sourceTaskName");
 			foreach($attributes as $sourceAttributeName=>$targets){
+				$this->addTrace("\t\t\t\t\t\t--$sourceAttributeName");
 				foreach($targets as $targetString){
 					$targetParts = explode('.', $targetString);
 					$targetTaskName = $targetParts[0];
 					$targetAttributeName = $targetParts[1];
-					
+					$this->addTrace("\t\t\t\t\t\t---$targetString");		
 					if(!$this->validateTaskMapping($sourceTaskName, $sourceAttributeName, $targetTaskName, $targetAttributeName)){
 						$this->addTrace('Invalid Task Mapping: '.$sourceTaskName.'.'.$sourceAttributeName.' => '.$targetTaskName.'.'.$targetAttributeName);
 						$parsed = false;
@@ -182,7 +185,7 @@ class KernelProcessesProcess extends KernelObject{
 		
 		if(!array_key_exists($targetTaskName, $this->tasks)){
 			if($targetTaskName!='Outputs' && $targetTaskName!='LocalData'){
-				$this->addError('Invalid Target Task Name Supplied', __LINE__);
+				$this->addError('Invalid Target Task Name Supplied: '.$targetTaskName, __LINE__);
 			}
 		}else{
 			$targetTask = $this->tasks[$targetTaskName];
@@ -329,16 +332,79 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function setInputValue($name, $value){
+		//retrieve the field definition
+		$fieldDef = $this->getInputDefinition($name);
 		
-		$definition = $this->getInputDefinition($name);
-		$type = $definition->getValue('Type')->getValue();
-		$typeString = str_replace('.', '', $type);
+		$targetValue = null;
 		
-		if($value instanceof $typeString){
-			$this->inputData[$name] = $value;		
+		//ensure the field definition exists
+		if($fieldDef && ($fieldDef instanceof KernelDataPrimitiveTaskInput)){
+			$typeObj = $fieldDef->getValue('Type');
+			$requiredObj = $fieldDef->getValue('Required');
+			$allowedObj = $fieldDef->getValue('AllowList');
+			
+			$type = $typeObj->getValue();
+			$required = $requiredObj->getValue();
+			$allowList = $allowedObj->getValue();
+			
+			if(!method_exists($value, 'getClassName')){
+				echo '----'."\n";
+				echo $name."\n";
+				echo $this->getClassName();
+				print_r($value);
+				echo '----'."\n";
+			}
+			
+			//supplied as the appropriate type?
+			if(strpos($value->getClassName(), $type)!=-1){
+				
+				if($required && $value->getValue()===null){
+					$this->addError($this->getClassName(), 'Field Required: '.$name);
+					return false;
+				}else{
+					if($allowList){
+						$targetValue = $this->getInputValue($name);
+						if(!($targetValue instanceof KernelDataPrimitiveList)){
+							$targetValue = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+						}
+						$targetValue->addItem($value);
+					}else{
+						try{
+							$targetValue = $value;
+						}catch(Exception $e){
+							print_r($e);
+						}
+					}
+				}
+			}else{
+				if($required && $value==null){
+					
+					$this->addError($this->getClassName(), 'Field Required: '.$name);
+					return false;
+				}else{
+					if($allowList){
+						$targetValue = $this->getInputValue($name);
+						if(!($targetValue instanceof KernelDataPrimitiveList)){
+							$targetValue = DataClassLoader::createInstance('Kernel.Data.Primitive.List');
+						}
+						$targetValue->addItem($value);
+						$targetValue = $value;
+					}else{
+						if($value instanceof KernelDataPrimitiveList){
+							$this->addError($this->getClassName(), 'Field Does not allow List Values: '.$name);
+							return false;
+						}else{
+							$targetValue = $value;
+						}
+					}
+				}
+			}
 		}else{
-			$this->inputData[$name] = DataClassLoader::createInstance($type, $value);
+			$this->addError($this->getClassName(), 'Invalid Input Definition Format: '.$name);
+			return false;
 		}
+		
+		$this->inputData[$name] = $targetValue;
 		
 	}
 	
@@ -394,12 +460,11 @@ class KernelProcessesProcess extends KernelObject{
 	 * Token Table Functions
 	 */
 	public function setTokenValue($taskName, $attributeName, $value){
+		if($taskName!='LocalData' && $taskName !='Outputs'){
+			$this->addTrace("\t\tSetting Token: ".$taskName.'.'.$attributeName);	
+		}
 		
 		$allowList = false;
-		
-		if(!array_key_exists($taskName, $this->tokenTable)){
-			$this->tokenTable[$taskName] = array();
-		}
 			
 		if($taskName=='LocalData' || $taskName=='Outputs'){
 			
@@ -408,15 +473,21 @@ class KernelProcessesProcess extends KernelObject{
 				//$this->tokenTable['LocalData'][$attributeName] = $value;
 				//echo $this->getLocalDataValue($attributeName)->getValue().'<br/>';
 			}else{
+				$this->addTrace("\t\tSetting Output: ".$attributeName);
 				$this->setOutputValue($attributeName, $value);
+				
 				if($attributeName=='Completed'){
-					//echo 'should be stopping<br/>';
-					if($value->getValue()===true){
+					if($value && $value->getValue()===true){
+						$this->addTrace('SHOULD REALLY BE STOPPING');
 						$this->processComplete = true;	
 					}
 				}
 			}
 		}else{
+			if(!array_key_exists($taskName, $this->tokenTable)){
+				$this->tokenTable[$taskName] = array();
+			}
+			
 			$task = $this->tasks[$taskName];
 			//if the task attribute allows lists add to the list
 			$attrDef = $task->getInputDefinition($attributeName);
@@ -435,18 +506,17 @@ class KernelProcessesProcess extends KernelObject{
 		}
 		
 		
-		
-		
-		if($attributeName=='Enabled' || $attributeName=='Reset'){
-				
-			$setValue = $value->getValue();
-			
+		if($attributeName=='Reset'){
 			if($value->getValue()==true){
-				$this->addTrace('					Enabled Task:'. $taskName);	
-			}
-			
-			if($attributeName=='Reset'){
+				$this->addTrace('				Resetting: '.$taskName);
+				
 				$task = $this->tasks[$taskName];
+				$task->setOutputValue('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
+				
+				$this->enabledTasks[$taskName] = true;
+				
+				unset($this->completedTasks[$taskName]);
+			
 				
 				$task->resetTask();
 				$this->tokenTable[$taskName] = array();
@@ -454,15 +524,16 @@ class KernelProcessesProcess extends KernelObject{
 				$revAttrs = $this->taskMapReverse[$taskName];
 				
 				foreach($revAttrs as $revAttrName=>$revInputs){
-				
+					
+					//$this->addTrace("\t\tResetting Input: ".$revInputString);
+					
 					$this->tokenTable[$taskName][] = array();
 					if($revAttrName!='Reset'){
 						foreach($revInputs as $revInputString){
-							
+							$this->addTrace("\t\t$revAttrName: ".$revInputString);		
 							$revParts = explode('.', $revInputString);
 							$revInTaskName = $revParts[0];
 							$revInAttrName = $revParts[1];
-							
 							switch($revInTaskName){
 								case 'Inputs':
 									$revAttrValue = $this->getInputValue($revInAttrName);
@@ -475,7 +546,7 @@ class KernelProcessesProcess extends KernelObject{
 									$revAttrValue = $revInTask->getOutputValue($revInAttrName);//$this->getTokenValue($revInTaskName, $revInAttrName);		
 									break;
 							}
-
+	
 							
 							if($revAttrValue){
 								$this->setTokenValue($taskName, $revAttrName, $revAttrValue);	
@@ -485,23 +556,19 @@ class KernelProcessesProcess extends KernelObject{
 					//print_r($revInputs);
 					
 				}
+				
 				$this->setTokenValue($taskName, 'Enabled', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true));
-				//$this->tokenTable[$taskName]['Enabled'] = DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', true);
+			}
+		}
+		
+		if($attributeName=='Enabled'){
+			if($value->getValue()==true){
+				$this->addTrace("\t\t\t\t- Enabling Task: $taskName");	
 			}
 			$this->enabledTasks[$taskName] = $value->getValue();
 		}
 		
-		if($attributeName=='Reset'){
-			$this->addTrace('				Resetting: '.$taskName);
-			
-			$task = $this->tasks[$taskName];
-			$task->setOutputValue('Completed', DataClassLoader::createInstance('Kernel.Data.Primitive.Boolean', false));
-			
-			$this->enabledTasks[$taskName] = true;
-			
-			unset($this->completedTasks[$taskName]);
-			
-		}
+		
 		
 		//update the token data for any tasks that rely on this data item
 		if(array_key_exists($taskName, $this->taskMap)){
@@ -541,9 +608,24 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function loadTaskTokens($taskName){
-		$this->addTrace('				Loading Tokens for: '.$taskName);
+		$this->addTrace("\t\t".'Loading Tokens for: '.$taskName);
 		$allSet = false;
+		
+		$inputs = $this->taskMapReverse[$taskName];
+		$taskObject = $this->tasks[$taskName];
+		foreach($inputs as $inputName=>$sources){
+			if($inputName!='Reset'){
+				$this->addTrace("\t\t\t\t - $inputName");
+				foreach($sources as $source){
+					$this->addTrace("\t\t\t\t -- $source");
+				}
+			}
+		}
+		
+		die('IN THE MIDDLE OF TRANSFERING THE SYSTEM OVER TO LOAD THE RESULTS DIRECTLY FROM THE TASKS INSTEAD OF USING A TOKEN TABLE');
+		
 		if(array_key_exists($taskName, $this->tokenTable)){
+				
 			$taskTokens = $this->tokenTable[$taskName];
 			
 			if(is_array($taskTokens)){
@@ -552,13 +634,15 @@ class KernelProcessesProcess extends KernelObject{
 					$allSet = true;
 					foreach($taskTokens as $attributeName=>$tokens){
 						if($attributeName!='Reset'){
-							$this->addTrace('				: '. $attributeName);
+							
 							
 							if(is_array($tokens)){
+								$this->addTrace("\t\t\t\t-$attributeName");	
 								foreach($tokens as $token){
 									$taskObject->setInputValue($attributeName, $token);
 								}
 							}else{
+								$this->addTrace("\t\t\t\t-$attributeName => ".$tokens->getValue());
 								$taskObject->setInputValue($attributeName, $tokens);
 							}
 							if(!$allSet){
@@ -592,12 +676,12 @@ class KernelProcessesProcess extends KernelObject{
 		$taskMapEntries = $this->taskMap[$taskName];
 		
 		foreach($taskMapEntries as $attributeName=>$targetStrings){
-			$this->addTrace('			'.$attributeName);
+			$this->addTrace("\t\t- ".$attributeName);
 			$targetValue = $task->getOutputValue($attributeName);
 			//$this->setTokenValue($taskName, $attributeName, $targetValue);
 			
 			foreach($targetStrings as $targetString){
-				$this->addTrace('				'.$targetString);
+				$this->addTrace("\t\t\t\t-- ".$targetString.' => '.$targetValue->getValue());
 				$targetParts = explode('.', $targetString);
 				$this->setTokenValue($targetParts[0], $targetParts[1], $targetValue);
 			}
@@ -647,7 +731,7 @@ class KernelProcessesProcess extends KernelObject{
 		
 		$this->addTrace('Starting Process: '.$this->getClassName(), self::TRACE_LEVEL_PROCESS);
 		
-		$this->addTrace('	Seeding Token Table');
+		$this->addTrace('Seeding Token Table');
 		
 		$inputs = $this->taskMap['Inputs'];
 		
@@ -657,7 +741,6 @@ class KernelProcessesProcess extends KernelObject{
 			
 			foreach($mappings as $mapping){
 				$parts = explode('.', $mapping);
-				$this->addTrace('	Setting Token: '.$mapping);
 				
 				$this->setTokenValue($parts[0], $parts[1], $itemData);
 			}
@@ -690,7 +773,7 @@ class KernelProcessesProcess extends KernelObject{
 			$this->processComplete = true;
 		}
 		
-		while(!$this->processComplete && $this->numLoops<=$this->maxLoops){
+		while(($this->processComplete!=true) && $this->numLoops<=$this->maxLoops){
 			$this->addTrace('		Starting Loop #'.$this->numLoops);
 			$taskName = $this->getNextTaskName();
 			if($taskName){
@@ -698,7 +781,6 @@ class KernelProcessesProcess extends KernelObject{
 					$this->addTrace('		Could not run Task: Process Aborting');
 					$processComplete = true;
 				}else{
-					//$this->completedTasks[$taskName] = true;
 					
 				}
 			}else{
@@ -711,6 +793,7 @@ class KernelProcessesProcess extends KernelObject{
 		}
 		
 		$this->addTrace('Process Execution Complete');
+		return true;
 	}
 
 	public function enableTask($taskName){
@@ -748,23 +831,32 @@ class KernelProcessesProcess extends KernelObject{
 		}else{
 			//run the task if it's ready
 			//echo 'running task: '.$taskName.'<br/>';
-			
+			$this->addTrace('Running: '.$task->getClassName());
 			if($task->run()){
+				$processTrace = $task->getTrace();
+				$this->trace = array_merge($this->trace, $processTrace);
+				
 				$this->addTrace('		Task Run Complete');
 				$this->transferTaskTokens($taskName);
 			}else{
 				
-				$this->addTrace('		'.$taskName.': "Run" returned False');
-				
 				$processTrace = $task->getTrace();
 				$this->trace = array_merge($this->trace, $processTrace);
 				
+				$this->addTrace('		'.$taskName.': "Run" returned False');
+				
 				$taskErrors = $task->getOutputValue('Errors');
-				$errorCount = $taskErrors->Count();
+				if($taskErrors){
+					$errorCount = $taskErrors->Count();	
+				}else{
+					$errorCount = 0;
+				}
+				
 				
 				for($x=0;$x<$errorCount;$x++){
 					$item = $taskErrors->getItem($x);
-					$this->addTaskError($item);	
+					$this->addTaskError($item);
+					$this->addTrace($item->getValue('Message')->getValue());
 				}
 				
 				$this->addTrace('		Added '.$errorCount.' errors');
@@ -818,7 +910,7 @@ class KernelProcessesProcess extends KernelObject{
 	}
 	
 	public function addTrace($message, $level=self::TRACE_LEVEL_DEBUG){
-		echo $message."\n";
+		//echo $message."\n";
 		if($this->trace_level>=$level){
 			$this->trace[] = array(
 				'time'=>time(), 
