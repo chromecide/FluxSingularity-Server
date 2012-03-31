@@ -67,7 +67,7 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 	 * AND
 	 * 
 	 */
-    public function find($queryObject){
+    public function find(&$queryObject){
     	
     	$returnArray = array();
 		$collectionName = $this->getObjectCollectionName();
@@ -93,21 +93,27 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 						}else{
 							if(is_array($conditionValue)){
 								$idAdded = false;
-								foreach($conditionValue as $conditionValueItem){
-									
-									if($conditionValueItem instanceof KernelObject){
-										if(!$idAdded){
-											$idAdded = true;
-											$conditionFieldName .= '.ID';
+								if(count($conditionValue)==1){
+									$tempConditionValues = $conditionValue[0];
+								}else{
+									foreach($conditionValue as $conditionValueItem){
+										$tempConditionValues = array();
+										if($conditionValueItem instanceof KernelObject){
+											if(!$idAdded){
+												$idAdded = true;
+												$conditionFieldName .= '.ID';
+											}
+											$tempConditionValues[] = $conditionValueItem->getValue('ID');
+										}else{
+											$tempConditionValues[] = $conditionValueItem;
 										}
-										$tempConditionValues[] = $conditionValueItem->getValue('ID');
-									}else{
-										$tempConditionValues[] = $conditionValueItem;
-									}
+									}	
 								}
+								
 								$conditionValue = $tempConditionValues;
 							}
 						}
+						
 						switch($conditionOperator){
 							case '>':
 								$conditionItem[$conditionFieldName]=array('$gt'=>$conditionValue);
@@ -146,9 +152,17 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 				}
 				
 				if($queryObject->getValue('Type')=='AND'){
-					$fullQuery = array('$and'=>$mongoQuery);
+					if(count($mongoQuery)>0){
+						$fullQuery = array('$and'=>$mongoQuery);	
+					}else{
+						$fullQuery = $mongoQuery;
+					}
 				}else{
-					$fullQuery = array('$or'=>$mongoQuery);
+					if(count($mongoQuery)>0){
+						$fullQuery = array('$and'=>$mongoQuery);	
+					}else{
+						$fullQuery = $mongoQuery;
+					}
 				}
 				
     		}else{
@@ -184,6 +198,7 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 			}else{
 				$sortFieldName = '_id';
 			}
+			
 			//echo json_encode($fullQuery);
 			//echo '<br/><Br/>';
 			
@@ -200,7 +215,9 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
     	}else{
     		throw new Exception("Invalid Query Object", 1);
     	}
-		
+		if(!$returnArray){
+			$returnArray = array();
+		}
 		$queryObject->setValue('Results', $returnArray);
 		
 		return $returnArray;
@@ -267,7 +284,6 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 			}else{
 				$sortFieldName = 'ID';
 			}
-			
 			$resultObject = $collection->findOne($mongoQuery);
 			
 			if($resultObject){
@@ -290,32 +306,33 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 			$collection = $db->$collectionName;
 			
 			$objectId = $object->getValue('ID');
-			
-			$objectData = $object->toArray(false);
+			$objectData = $object->toArray(true, true, true, true, true, false, false);
 			
 			//first load the item so we're only updating existing values
-			$mongoQuery = array('Data.ID'=>$objectData['Data']['ID']);
+			$mongoQuery = array('Data.ID'=>$objectId);
 			
 			$existingDocument = $collection->findOne($mongoQuery);
-			//print_r($existingDocument);
+			
 			if($existingDocument){
 				$documentId = $existingDocument['_id'];
 				$saveData = $existingDocument;
-				$saveData = array_replace_recursive($existingDocument, $objectData);
+				
+				$saveData = $objectData;
+				
 				$saveData['_id'] = $documentId;
 			}else{
 				$saveData = $objectData;
 			}
-			if($object->usesDefinition('Modules.FSmanager.Object.Toolbar')){
-				print_r($saveData);
-			}
+			
 			try{
 				if($collection->save($saveData)){
+					
 					$itemId = $saveData['Data']['ID'];
 					if(!$itemId){
 						$itemId = $saveData['_id'].'';
 						$saveData['Data']['ID']=$itemId;
 						$collection->save($saveData);
+						
 						$object->setValue('ID', $itemId);
 					}
 					if($itemId){
@@ -345,10 +362,10 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 		$queryObject = new KernelObject(array('SuspendEvents'=>true));
 		
     	if($object->getValue('ID')){
-    		$mongoQuery['_id'] = new MongoId($object->getValue('ID'));
-			
-			return $collection->remove($mongoQuery);
+    		$conditions = array('Data.ID'=>$object->getValue('ID'));
+			return $collection->remove($conditions);
     	}else{
+    		
     		throw new Exception("Invalid Query Object", 1);
     	}
     }
@@ -459,7 +476,7 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 	public function populateObject(&$object, $document){
 		if($document['_id']){
 			$document['ID'] = $document['_id'].'';
-			unset($document['_id']); 
+			unset($document['_id']);
 		}
 		
 		$object->fromArray($document, true);

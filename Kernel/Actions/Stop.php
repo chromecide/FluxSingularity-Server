@@ -13,7 +13,6 @@ class KernelActionsStop extends KernelObject{
 	}
 	
 	public function run(){
-		echo 'stopping<br/>';
 		return false;
 	}
 }

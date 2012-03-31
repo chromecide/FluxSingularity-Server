@@ -39,7 +39,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$toolbarDefinition->setValue('Description', 'FSManager Toolbar Definition');
 		$toolbarDefinition->setValue('Author', 'FSManager Module Installer');
 		$toolbarDefinition->setValue('Version', '1.0.0');
-		$toolbarDefinition->addAttribute('Items', 'Object', false, true, true);
+		$toolbarDefinition->addAttribute('Items', 'Modules.FSManager.Object.Toolbar.Button', false, true, true);
 		$toolbarDefinition->addAttribute('Enabled', 'Object.Boolean');
 		$toolbarDefinition->addAttribute('Height', 'Object.Number');
 		$toolbarDefinition->addAttribute('Title', 'Object.String');
@@ -116,7 +116,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$objectList[] = $applicationDefinition;
 		
 		//Session Definition
-		$sessionDefinition = new KernelObject('Object.Definition');
+		/*$sessionDefinition = new KernelObject('Object.Definition');
 		$sessionDefinition->setValue('ID', 'Modules.FSManager.Object.Session');
 		$sessionDefinition->setValue('Name', 'Modules.FSManager.Object.Session');
 		$sessionDefinition->setValue('Description', 'FSManager Session Definition');
@@ -126,9 +126,9 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$sessionDefinition->addAttribute('User', 'Object.Security.User', false, false, false);
 		$sessionDefinition->addAttribute('LastAccessed', 'Object.Date', true);
 		$sessionDefinition->addAttribute('LinkedSessions', 'Object', false, true, false);
-		$sessionDefinition->addEvent('NewSession');
+		//$sessionDefinition->addEvent('NewSession');
 		$sessionDefinition->addAction('NewSession', 'Generate Tokens', 'Modules.FSManager.Actions.GenerateSessionTokens');
-		$objectList[] = $sessionDefinition;
+		$objectList[] = $sessionDefinition;*/
 		
 		
 		
@@ -167,19 +167,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 	public function installActionDefinitions(){
 		//Assign Guest Viewport
 		$assignGuestViewportAction = new ModulesFSManagerActionsAssignGuestViewport();
-		$assignGuestViewportAction->save();	
-		
-		//Authenticate User
-		$authenticateUserAction = new ModulesFSManagerActionsAuthenticateUser();
-		$authenticateUserAction->save();	
-		
-		//Update Session
-		$updateSessionAction = new ModulesFSManagerActionsUpdateSession();
-		$updateSessionAction->save();	
-		
-		//Update Session
-		$generateTokensAction = new ModulesFSManagerActionsUpdateSession();
-		$generateTokensAction->save();
+		$assignGuestViewportAction->save();
 	}
 	
 	public function installData(){
@@ -209,7 +197,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$guestToolbar->setValue('Version', '1.0.0');
 		$guestToolbar->setValue('Enabled', true);
 		$guestToolbar->setValue('Title', 'Flux Singularity');
-		$guestToolbar->addValue('Items', $loginButton);
+		//$guestToolbar->addValue('Items', $loginButton);
 		
 		$guestViewport = new KernelObject('Modules.FSManager.Object.Viewport');
 		$guestViewport->setValue('Name', 'FSManager Guest Viewport');
@@ -224,6 +212,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 			if($continue){
 				if(!$object->save()){
 					echo 'could not install'.$object->getValue('Name').'<br/>';
+					fb($object);
 					$continue = false;
 				}	
 			}
