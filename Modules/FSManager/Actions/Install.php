@@ -39,7 +39,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$toolbarDefinition->setValue('Description', 'FSManager Toolbar Definition');
 		$toolbarDefinition->setValue('Author', 'FSManager Module Installer');
 		$toolbarDefinition->setValue('Version', '1.0.0');
-		$toolbarDefinition->addAttribute('Items', 'Modules.FSManager.Object.Toolbar.Button', false, true, true);
+		$toolbarDefinition->addAttribute('Items', 'Object', false, true, true);
 		$toolbarDefinition->addAttribute('Enabled', 'Object.Boolean');
 		$toolbarDefinition->addAttribute('Height', 'Object.Number');
 		$toolbarDefinition->addAttribute('Title', 'Object.String');
@@ -197,7 +197,7 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$guestToolbar->setValue('Version', '1.0.0');
 		$guestToolbar->setValue('Enabled', true);
 		$guestToolbar->setValue('Title', 'Flux Singularity');
-		//$guestToolbar->addValue('Items', $loginButton);
+		$guestToolbar->addValue('Items', $loginButton);
 		
 		$guestViewport = new KernelObject('Modules.FSManager.Object.Viewport');
 		$guestViewport->setValue('Name', 'FSManager Guest Viewport');
@@ -205,13 +205,14 @@ class ModulesFSManagerActionsInstall extends KernelObject{
 		$guestViewport->setValue('Version', '1.0.0');
 		$guestViewport->setValue('Author', 'FSManager Module Installer');
 		$guestViewport->setValue('TopBar', $guestToolbar);
-		
+		fb($guestViewport->toArray());
 		$objectList[] = $guestViewport;
 		$continue = true;
 		foreach($objectList as &$object){
 			if($continue){
 				if(!$object->save()){
 					echo 'could not install'.$object->getValue('Name').'<br/>';
+					fb($object->getValue('TopBar'));
 					fb($object);
 					$continue = false;
 				}	

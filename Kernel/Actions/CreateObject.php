@@ -5,7 +5,7 @@ class KernelActionsCreateObject extends KernelObject{
 		
 		$this->addDefinition('Kernel.Action');
 		
-		$this->setObjectName('Kernel.Action.CreateObject');
+		$this->setObjectName('Kernel.Actions.CreateObject');
 		$this->setObjectDescription('Create a Data Object');
 		$this->setObjectAuthor('Justin Pradier');
 		$this->setObjectVersion('1.0.0');

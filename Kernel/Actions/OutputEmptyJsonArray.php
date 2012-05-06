@@ -5,7 +5,7 @@ class KernelActionsOutputEmptyJsonArray extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.OutputEmptyJsonArray');
+		$this->setValue('ID','Kernel.Actions.OutputEmptyJsonArray');
 		$this->setValue('Name','Output Empty JSON Array');
 		$this->setValue('Description', 'Outputs an Empty JSON Array');
 		$this->setValue('Author', 'Justin Pradier');

@@ -1,20 +1,21 @@
 <?php
-class KernelActionsAssignTokens extends KernelObject{
+class ModulesAPIActionsAssignTokens extends KernelObject{
 	public function __construct($cfg=null){
 		parent::__construct($cfg);
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Actions.AssignTokens');
-		$this->setValue('Name','Assign Tokens');
+		$this->setValue('ID','Modules.API.Actions.AssignTokens');
+		$this->setValue('Name','Assign API Tokens');
 		$this->setValue('Description', 'Assigns Tokens to an API Session');
 		$this->setValue('Author', 'Justin Pradier');
 		$this->setValue('Version', '1.0.0');
 		
-		$this->addAttribute('Session', 'API.Session', false, false, true);
-		$this->addAttribute('TokenCount', 'Object.Number', true, false);
-		$this->addAttribute('Mode', 'Object.String', true, false, true);
-		$this->addAttribute('AllowedActions', 'Object.Action', false, true, true, 'Allowed Actions');
+		$this->addAttribute('Session', array('Modules.API.Session'), true, false, true);
+		$this->addAttribute('TokenCount', array('Object.Number'), true, false);
+		$this->addAttribute('Mode', array('Object.String'), true, false, true);
+		$this->addAttribute('AllowedActions', array('Object.Action'), false, true, true);
+		
 		$this->setValue('TokenCount', 1);
 		$this->setValue('Mode', 'R');
 	}
@@ -25,19 +26,21 @@ class KernelActionsAssignTokens extends KernelObject{
 			return false;
 		}
 		
-		if($inputObject->usesDefinition('API.Session')){
+		if($inputObject->usesDefinition('Modules.API.Session')){
 			$sessionObject = $inputObject;
 		}else{
 			$sessionObject = $this->getValue('Session');
+			$sessionObject->loadById($sessionObject->getValue('ID'));
 		}
 		
-		if($sessionObject && $sessionObject->usesDefinition('API.Session')){
+		if($sessionObject && $sessionObject->usesDefinition('Modules.API.Session')){
 			$tokenCount = $this->getValue('TokenCount');
 			$mode = $this->getValue('Mode');
 			$allowedActions = $this->getValue('AllowedActions');
 			
 			for($i=0;$i<$tokenCount;$i++){
-				$token = new KernelObject('API.Token');
+				$token = new KernelObject();
+				$token->useDefinition('Modules.API.Token'); 
 				$token->setValue('Mode', $mode);
 				
 				if($allowedActions){
@@ -48,8 +51,6 @@ class KernelActionsAssignTokens extends KernelObject{
 				$sessionObject->addValue('Tokens', $token);
 			}
 			$sessionObject->save();
-			//fb('Session contains'. count($sessionObject->getValue('Tokens')));
-			//fb($sessionObject);
 		}
 		
 		return parent::afterRun($inputObject);

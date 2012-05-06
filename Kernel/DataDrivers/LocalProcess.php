@@ -1,9 +1,7 @@
 <?php
 
-class KernelDataDriverMongoDB extends KernelDataDriver {
-	private $mongo;
-	private $db;
-	private $config=array();
+class KernelDataDriverLocalProcess extends KernelDataDriver {
+	public static $objectCache = array();
 	
 	function __construct($config){
 		parent::__construct($config);
@@ -11,45 +9,27 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 	}
 	
 	public function connect(){
-		$this->mongo = new Mongo();
-		
-		if(array_key_exists('Database', $this->config)){
-			$databaseName = $this->getDatabaseName();
-			$mongo = $this->mongo;
-			$this->db = $mongo->$databaseName;
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public function disconnect(){
-		unset($this->db);
-		unset($this->mongo);
 		return true;
 	}
 	
-    public function loadById(&$object){
+	public function disconnect(){
+		return true;
+	}
+	
+    public function &findById($objectId){
     	
-		$collectionName = $this->getObjectCollectionName();
-		
-    	$db = $this->db;
-		$collection = $db->$collectionName;
-    	$mongoQuery = array();
-		//$queryObject = new KernelObject('Object.Query');
-		
-    	if($object->getValue('ID')){
-    		$mongoQuery['Data.ID'] = $object->getValue('ID');
-			
-			$cursor = $collection->findOne($mongoQuery);
-			
-			if($cursor){
-				return $this->populateObject($object, $cursor);
+    	if($objectId){
+    		if(array_key_exists($objectId, self::$objectCache)){
+    			$returnObject = &self::$objectCache[$objectId];
+				return $returnObject;
 			}
-			
     	}else{
-    		throw new Exception("Invalid Query Object (loadById)", 1);
+    		fb(debug_backtrace());
+    		throw new Exception("Invalid Query Object (findById)", 1);
     	}
+		
+		$returnValue = false;
+		return $returnValue;
     }
     /*
 	 * >
@@ -69,152 +49,78 @@ class KernelDataDriverMongoDB extends KernelDataDriver {
 	 */
     public function find(&$queryObject){
     	
-    	$returnArray = array();
-		$collectionName = $this->getObjectCollectionName();
-		
-    	$db = $this->db;
-		$collection = $db->$collectionName;
-    	$mongoQuery = array();
-    	if($queryObject instanceof KernelObject){
-    		if($queryObject->usesDefinition('Object.Query')){
-				$fullQuery = $this->objectToQuery($queryObject);
-    		}else{
-    			//$queryObject->addField('Results', 'Kernel.Object', false, true);
-    			//basic object based query
-    			fb('--==--');
-				fb($queryObject);
-	    		$queryFields = $queryObject->getObjectFields();
-				fb('--==--');
-				foreach($queryFields as $field){
-					switch($field->getName()){
-						case '_QueryType':
-						case '_QuerySort':
-							break;
-						case '_id':
-							$mongoQuery[$field->getName()] = new MongoId($queryObject->getValue($field->getName()));
-							break;
-						case 'Name':
-						case 'Author':
-						case 'Description':
-						case 'Version':
-						case 'Definitions':
-						case 'Fields':
-							$mongoQuery[$field->getName()] = $queryObject->getValue($field->getName());
-							break;
-						default:
-							$mongoQuery['Data.'.$field->getName()] = $queryObject->getValue($field->getName());
-					}
-				}
-				$fullQuery = array('$and'=>array($mongoQuery));
-    		}
-    		
-			if($queryObject->getValue('_QuerySort')){
-				$sortFieldName = $queryObject->getValue('_QuerySort');
-			}else{
-				$sortFieldName = '_id';
-			}
-			
-			//echo json_encode($fullQuery);
-			//echo '<br/><Br/>';
-			
-			$cursor = $collection->find($fullQuery)->sort(array($sortFieldName=>0));
-			
-			if($cursor){
-				while( $cursor->hasNext() ) {
-					$resultObject = new KernelObject();
-					$this->populateObject($resultObject, $cursor->getNext());
-					$returnArray[] = $resultObject;
-				}	
-			}
-			
-    	}else{
-    		throw new Exception("Invalid Query Object (find)", 1);
-    	}
-		if(!$returnArray){
-			$returnArray = array();
-		}
-		$queryObject->setValue('QueryString', json_encode($fullQuery));
-		$queryObject->setValue('Results', $returnArray);
-		
 		return $returnArray;
     }
     
     public function findOne(&$queryObject){
-    	
-    	$returnArray = array();
-		$collectionName = $this->getObjectCollectionName();
+    	$returnModel = null;
 		
-    	$db = $this->db;
-		$collection = $db->$collectionName;
-    	$mongoQuery = array();
-    	if($queryObject instanceof KernelObject){
-    		//load the field definitions
-    		$queryFields = $queryObject->getAttributes();
-			if($queryObject->usesDefinition('Object.Query')){
-				
-			}else{
-				$attributeList = $queryObject->getAttributes();
-				foreach($attributeList as $attributeName=>$attributeCfg){
-					$definitions = array();
-					$required = false; 
-					$isList = false;
-					$isPrimitive=false;
-					
-					if($attributeCfg){
-						if(array_key_exists('Definitions', $attributeCfg)){
-							$definitions = $attributeCfg['Definitions'];
-						}
-						
-						if(array_key_exists('Required', $attributeCfg)){
-							$required = $attributeCfg['Required'];
-						}
-						
-						if(array_key_exists('IsList', $attributeCfg)){
-							$isList = $attributeCfg['IsList'];
-						}
-						
-						if(array_key_exists('IsPrimitive', $attributeCfg)){
-							$isPrimitive = $attributeCfg['IsPrimitive'];
-						}
-					}
-					
-					$attributeValue = $queryObject->getValue($attributeName);
-					
-					if(!is_null($attributeValue)){
-						
-						if($attributeValue instanceof KernelObject){
-							if($isPrimitive){
-								$mongoQuery['Data.'.$attributeName] = $attributeValue->toArray();
-							}else{
-								$mongoQuery['Data.'.$attributeName] = array('ID'=>$attributeValue->getValue('ID'));
-							}
-						}else{
-							$mongoQuery['Data.'.$attributeName] = $attributeValue;
-						}
-					}
+		$attributeList = $queryObject->getAttributes();
+		$conditions = array();
+		
+		foreach($attributeList as $attributeID=>$attributeCfg){
+			$queryObject->returnDefaults = false;
+			$attrValue = $queryObject->getValue($attributeID); 
+			if($attrValue){
+				$conditions[$attributeID] = $attrValue;
+			}
+		}
+		
+		foreach(self::$objectCache as $result){
+			$resultMatch = true;
+			foreach($conditions as $attrName=>$attrValue){
+				if($result['Data'][$attrName]!=$attrValue){
+					$resultMatch = false;
 				}
 			}
-			
-			if($queryObject->getValue('SortBy')){
-				$sortFieldName = $queryObject->getValue('SortBy');
-			}else{
-				$sortFieldName = 'ID';
+			if($resultMatch){
+				$returnModel = $result;
+				break;
 			}
-			$resultObject = $collection->findOne($mongoQuery);
-			
-			if($resultObject){
-				$finalResult = $this->populateObject($queryObject, $resultObject);
-				return true;
-			}else{
-				return false;
-			}
-			
+		}
+		
+		if($returnModel){
+			return $returnModel;
     	}else{
     		throw new Exception("Invalid Query Object (findOne)", 1);
     	}
     }
-    
-    public function save(&$object){
+
+    public function save(&$model){
+    	$collectionName = $this->getObjectCollectionName();
+		
+		$objectId = false;
+		
+		if(array_key_exists('ID', $model['Data'])){
+			$objectId = $model['Data']['ID'];	
+		}
+		
+		if(!$objectId){
+			$model['Data']['ID'] = uniqid();
+		}
+		
+		$mongoQuery = array('Data.ID'=>$objectId);
+		
+		//$existingDocument = $collection->findOne($mongoQuery);
+		if(!array_key_exists($model['Data']['ID'], self::$objectCache)){
+			self::$objectCache[$model['Data']['ID']] = &$model;
+		}else{
+			self::$objectCache[$model['Data']['ID']] = &$model;
+		}
+		return true;
+		/*if($collection->save($model)){
+			$itemId = $model['Data']['ID'];
+			if(!$itemId){
+				$itemId = $model['_id'].'';
+				$model['Data']['ID']=$itemId;
+			}
+			if(!array_key_exists($model['Data']['ID'], self::$objectCache)){
+				self::$objectCache[$model['Data']['ID']]=$model;
+			}
+		}*/
+    }
+	
+    public function save2(&$object){
     	if($object instanceof KernelObject){
     		$collectionName = $this->getObjectCollectionName();
 			

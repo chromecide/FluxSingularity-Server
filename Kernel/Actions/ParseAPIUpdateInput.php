@@ -5,7 +5,7 @@ class KernelActionsParseAPIUpdateInput extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.ParseAPIUpdateInput');
+		$this->setValue('ID','Kernel.Actions.ParseAPIUpdateInput');
 		$this->setValue('Name','Parse API.Update Inputs');
 		$this->setValue('Description', 'Creates System Objects from data sent for an update');
 		$this->setValue('Author', 'Justin Pradier');

@@ -31,8 +31,13 @@ class KernelObject{
 	public static $KernelPath = '';
 	public static $ModulePath = '';
 	
+	private static $loadedInstances = array();
+	
+	private $reverseMap = array();
+	
 	protected $ReservedDefinitions = array(
 		'Object',
+		'Object.DataSource',
 		'Object.Definition',
 		'Object.Event',
 		'Object.Action',
@@ -43,6 +48,7 @@ class KernelObject{
 		'Object.Query',
 		'Object.Security.User',
 		'Object.Security.Network',
+		'Object.Security.UserLogin',
 		'Object.String',
 		'Object.Number',
 		'Object.Date',
@@ -56,8 +62,7 @@ class KernelObject{
 	);
 	
 	public function __construct($cfg=null){
-		
-			self::$KernelPath = dirname(__FILE__);
+		self::$KernelPath = dirname(__FILE__);
 		
 		
 		//if(!self::$ModulePath){
@@ -92,7 +97,7 @@ class KernelObject{
 	
 	public function load($id){
 		if(!$this->fireEvent('BeforeLoad')){return false;}
-		
+		$loaded = false;
 		$isReserved = false;
 		$dataSource = $this->getDataSource();
 		
@@ -102,12 +107,22 @@ class KernelObject{
 			$isReserved = true;
 		}
 		
+		foreach(self::$loadedInstances as $instance){
+			if($instance->getValue('ID')==$id){
+				$loaded = true;
+			}
+		}
+		
 		if($id!=''){
 			$this->setValue('ID', $id);
-		
+			//$this->AttributeValues = null;
 			if(!$dataSource->loadById($this)){
 				if(!$isReserved){
 					return false;
+				}
+			}else{
+				if(!$loaded){
+					self::$loadedInstances[] = &$this;
 				}
 			}
 		}
@@ -190,6 +205,17 @@ class KernelObject{
 				$this->addEvent('BeforeRemove', array('Source'=>'Object'));
 				$this->addEvent('AfterRemove', array('Source'=>'Object'));
 				break;
+			case 'Object.DataSource':
+				$this->addAttribute('DriverName', 'Object.String', false);
+				$this->addAttribute('DatabaseName', 'Object.String', false);
+				$this->addAttribute('DatabaseUser', 'Object.String', false);
+				$this->addAttribute('DatabasePassword', 'Object.String', false);
+				
+				$this->addEvent('Connected');
+				$this->addEvent('Disconnected');
+				$this->addEvent('BeforeFind');
+				$this->addEvent('AfterFind');
+				break;
 			case 'Object.AttributeMap':
 				$this->addAttribute('Source', 'Object.String', false, false, true);	
 				$this->addAttribute('Targets', 'Object.String', false, true, true);
@@ -216,6 +242,7 @@ class KernelObject{
 			case 'Object.Query':
 				$this->addAttribute('Conditions', 'Object.Condition', true, true);
 				$this->addAttribute('Results', 'Object', true, true);
+				$this->addAttribute('QueryString', 'Object.String', true, true);
 				break;
 			case 'Object.Security.User':
 				$this->addAttribute('Username', 'Object.String', true, false, 'User Name');
@@ -232,12 +259,15 @@ class KernelObject{
 				$this->addAttribute('Username', 'Object.String', true, false, 'User Name');
 				$this->addAttribute('Password', 'Object.String', true, false, 'Password');
 				
-				$this->addEvent('LoginSuccessful');
+				$this->addEvent('LoginSucceeded');
 				$this->addEvent('LoginFailed');
 				break; 
 			case 'Object.Module':
 				$this->addAttribute('DefinitionList', 'Object.Definition', true, true, false, 'Definition List');
 				$this->addAttribute('ActionList', 'Object.Action', true, true, false, 'Action List');
+				break;
+			case 'API.Client':
+				$this->addAttribute('BlackList', 'Object.String', false, true);
 				break;
 			case 'API.Token':
 				$this->addAttribute('Mode', 'Object.String', true);
@@ -247,17 +277,25 @@ class KernelObject{
 				$this->addAttribute('User', 'Object.Security.User', false, false, false);
 				$this->addAttribute('LastAccessed', 'Object.Date', true);
 				$this->addAttribute('LinkedSessions', 'API.Session', false, true, false);
-				$this->addAttribute('Tokens', 'API.Token', true, true, true);
+				$this->addAttribute('Tokens', 'API.Token', true, true, false);
+				$this->addAttribute('RemoteAddress', 'Object.String', true, false, true);
+				$this->addAttribute('Client', array('Object.String', 'Object.Client'), true, false, true);
 				//$this->addEvent('NewSession');
 				//$this->addAction('NewSession', 'Generate Start Tokens', 'Modules.FSManager.Actions.GenerateSessionTokens');
 				break;
 			case 'API.Read':
-				$this->addAttribute('Session', 'Modules.FSManager.Object.Session', true);
-				$this->addAttribute('Token', 'Object.String', true);
-				
+				$this->addAttribute('Session', array('Object.String', 'API.Session'), true);
+				$this->addAttribute('Client', array('Object.String', 'API.Client'), true);
+				$this->addAttribute('Token', array('Object.String', 'API.Token'), true);
+				$this->addAttribute('Query', 'Object.Query', true);
 				$this->addEvent('TokenValid');
 				$this->addEvent('TokenInvalid');
 				$this->addEvent('SessionInvalid');
+				
+				//$this->addAction('BeforeSave', 		'I', 						'Kernel.Actions.Stop');
+				$this->addAction('BeforeSave', 		'Done', 						'Kernel.Actions.Stop');
+				/*
+				$this->addAction('BeforeSave', 		'Validate Session',				'Kernel.Actions.ValidateAPISession');
 				$this->addAction('BeforeSave', 		'Initialise API Read', 			'Kernel.Actions.ParseAPIReadInput');
 				$this->addAction('BeforeSave',		'Validate Message Token', 		'Kernel.Actions.ValidateAPIToken');
 				$this->addAction('BeforeSave', 		'Done', 						'Kernel.Actions.Stop');
@@ -380,7 +418,7 @@ class KernelObject{
 				//$this->addAction('TokenValid', 		'Run Read Query', 				'Kernel.Actions.RunQuery');
 				$this->addAction('TokenInvalid', 	'Clear Object Actions', 		'Kernel.Actions.ClearActions');
 				$this->addAction('TokenInvalid', 	'Output JSON', 					'Kernel.Actions.OutputEmptyJsonArray');
-				$this->addAction('TokenInvalid', 	'Done', 						'Kernel.Actions.Stop');
+				$this->addAction('TokenInvalid', 	'Done', 						'Kernel.Actions.Stop');*/
 				break;
 			case 'API.Update':
 				$this->addAttribute('Session', 'Modules.FSManager.Object.Session', true);
@@ -570,11 +608,11 @@ class KernelObject{
 						$definitionObject = $object;
 					}
 				}else{
-					$this->addError('Not a Valid Definition Object', $object);
+					$this->addError('Not a Valid Definition Object 1', $object);
 					return false;
 				}
 			}else{
-				$this->addError('Not a Valid Definition Object', $object);
+				$this->addError('Not a Valid Definition Object 2', $object);
 				return false;
 			}	
 		}
@@ -609,11 +647,7 @@ class KernelObject{
 			if(is_array($actionList)){
 				foreach($actionList as $eventName=>$action){
 					foreach($action as $actionName=>$actionCfg){
-						//echo 'adding action';
 						$actionObject = new KernelObject('Object.Action');
-						
-						//$conditions = array_key_exists('Conditions', $actionCfg)?$actionCfg['Conditions']:array();
-						//$mapping = array_key_exists('ObjectMap', $actionCfg)?$actionCfg['ObjectMap']:array();
 						$this->addAction($eventName, $actionObject);	
 					}
 				}
@@ -817,10 +851,6 @@ class KernelObject{
 			$permissionObject->setValue('Delete', $remove);
 		}
 		
-		
-		
-		
-		
 		$this->Permissions[] = $permissionObject;
 		
 		return $this->fireEvent('AfterAddPermission');
@@ -831,8 +861,9 @@ class KernelObject{
 	}
 	
 	public function addError($msg, $input=null){
-		fb($msg);
+		fb('Error Occurred: '.$msg);
 		fb($input);
+		fb('End Error');
 		$this->Errors[] = array($msg, $input);
 	}
 	
@@ -844,18 +875,26 @@ class KernelObject{
 		$returnValue = null;
 		if(is_array($this->AttributeValues)){
 			if(strpos($attributeName, '.')){
-				$attributeParts = explode('.', $attributeName, 1);
+				$attributeParts = explode('.', $attributeName, 2);
 				$thisObjectAttribute = $attributeParts[0];
-				if($thisObjectAttribute=='ActionParent'){
-					$returnValue = $this->ActionParent;
+				$subAttributeName = $attributeParts[1];
+				if($thisObjectAttribute=='InputObject'){
+					if($subAttributeName){
+						$returnValue = $this->ActionParent->getValue($subAttributeName);
+					}else{
+						$returnValue = $this->ActionParent;	
+					}
 				}else{
-					if(array_key_exists($thisObjectAttribute, $this->AttributeValues)){
-						$attributeValue = $this->AttributeValues[$thisObjectAttribute];
-						$returnValue = $attributeValue->getValue($attributeParts[1]);
-					}	
+					$attributeValue = $this->AttributeValues[$thisObjectAttribute];
+					if($attributeValue){
+						$returnValue = $attributeValue->getValue($subAttributeName);	
+					}else{
+						$returnValue = null;
+					}
+					
 				}
 			}else{
-				if($attributeName=='ActionParent'){
+				if($attributeName=='InputObject'){
 					$returnValue = $this->ActionParent;
 				}else{
 					if(array_key_exists($attributeName, $this->AttributeValues)){
@@ -869,7 +908,7 @@ class KernelObject{
 	}
 	
 	
-	private function runValuePreProcessor($attributeName, $attributeValue, $updateExistingDefinitions=false){
+	private function runValuePreProcessor($attributeName, $attributeValue, $updateExistingDefinitions=false, $addingValue=false){
 		if(!is_array($this->Attributes)){
 			$this->Attributes = array();
 		}
@@ -898,7 +937,6 @@ class KernelObject{
 					$attributeDefinitions = $attributeValue->getDefinitions();
 				}else{
 					if(is_array($attributeValue)){
-						
 						$attributeCfg = $this->getAttribute($attributeName);
 						
 						if($attributeCfg && is_array($attributeCfg)){
@@ -915,13 +953,11 @@ class KernelObject{
 								//we can assume it is an object configuration array, so attempt to create a KernelObject from it
 								$newValue = new KernelObject();
 								if(array_key_exists('ID', $attributeValue)){
-									echo 'loading item';
 									if($newValue->load($attributeValue['ID'])){
 										$attributeValue = $newValue;
 										$attributeDefinitions = $newValue->getDefinitions();
 									}
 								}else{
-									print_r($attributeValue);
 									if($newValue->fromArray($attributeValue)){
 										$attributeValue = $newValue;
 										$attributeDefinitions = $newValue->getDefinitions();
@@ -945,7 +981,14 @@ class KernelObject{
 				
 				$this->updateAttribute($attributeName, $attributeDefinitions, $required, $isList, $isPrimitive, $label);
 			}else{
-				$this->addAttribute($attributeName, $attributeDefinitions);	
+				if(!array_key_exists($attributeName, $this->Attributes)){
+					if($addingValue){
+						$this->addAttribute($attributeName, $attributeDefinitions, false, true);
+					}else{
+						$this->addAttribute($attributeName, $attributeDefinitions);	
+					}
+						
+				}	
 			}
 		}
 		
@@ -960,7 +1003,8 @@ class KernelObject{
 		if($attributeValue==null){
 			return;
 		}
-		if(!$this->runValuePreProcessor($attributeName, $attributeValue)){
+		
+		if(!$this->runValuePreProcessor($attributeName, $attributeValue, false, true)){
 			return false;
 		}
 		
@@ -989,16 +1033,23 @@ class KernelObject{
 						$attributeData = $attributeValue;
 						$attributeValue = new KernelObject();
 						
-						foreach ($attributeCfg['Definitions'] as $definitionName) {
+						foreach ($attributeCfg['Definitions'] as $key=>$definitionName) {
+							if(is_array($definitionName)){
+								$definitionName = $key;
+							}
 							$attributeValue->useDefinition($definitionName);
 						}
-						
-						if($attributeID){
-							$attributeValue->load($attributeID);	
-						}else{							
-							$attributeValue->fromArray($attributeData);
+						if($attributeCfg['IsPrimitive']){
+							$isPrimitive = true;
+						}else{
+							$isPrimitive = false;
 						}
 						
+						if($attributeID && !$isPrimitive){
+							$attributeValue->load($attributeID);	
+						}else{
+							$attributeValue->fromArray($attributeData);
+						}
 					}		
 					break;
 			}
@@ -1015,71 +1066,81 @@ class KernelObject{
 	}
 	
 	public function setValue($attributeName, $attributeValue=null){
-		
-		$attributeCfg = $this->getAttribute($attributeName);
-		
-		if(is_array($attributeValue)){
-			
-			if($attributeCfg['IsList']){
-				$this->AttributeValues[$attributeName] = array();
-				foreach($attributeValue as $itemValue){
-					$this->addValue($attributeName, $itemValue);
-				}
-				return true;
+		if(strpos($attributeName, '.')>-1){
+			$attributeParts = explode('.', $attributeName, 2);
+			$subAttributeName= $attributeParts[1];
+			if($attributeParts[0]=='InputObject'){
+				$itemObject = $this->ActionParent;
 			}else{
-				
+				$itemObject = $this->getValue($attributeParts[0]);
+			}
+			$itemObject->setValue($subAttributeName, $attributeValue);
+		}else{
+			$attributeCfg = $this->getAttribute($attributeName);
+			
+			if(is_array($attributeValue)){
+				if($attributeCfg['IsList']){
+					$this->AttributeValues[$attributeName] = array();
+					foreach($attributeValue as $itemValue){
+						$this->addValue($attributeName, $itemValue);
+					}
+					return true;
+				}else{
+					if(!$this->runValuePreProcessor($attributeName, $attributeValue)){
+						return false;
+					}	
+				}
+			}else{
 				if(!$this->runValuePreProcessor($attributeName, $attributeValue)){
 					return false;
 				}	
 			}
-		}else{
-			if(!$this->runValuePreProcessor($attributeName, $attributeValue)){
-				return false;
-			}	
-		}
-		
-		if(!$attributeValue instanceof KernelObject){
 			
-			switch($attributeName){
-				case 'ID':
-				case 'Name':
-				case 'Description':
-				case 'Author':
-				case 'Version':
-					
-					break;
-				default:
-					if(in_array('Object.String', $attributeCfg['Definitions']) || in_array('Object.Number', $attributeCfg['Definitions']) ||
-					 		in_array('Object.Date', $attributeCfg['Definitions']) || in_array('Object.Boolean', $attributeCfg['Definitions'])){
+			if(!$attributeValue instanceof KernelObject){
+				
+				switch($attributeName){
+					case 'ID':
+					case 'Name':
+					case 'Description':
+					case 'Author':
+					case 'Version':
 						
-					}else{
-						if(!is_scalar($attributeValue)){
-								
-							if(is_array($attributeValue)){
-								
-								$attributeData = $attributeValue;
-								$attributeValue = new KernelObject();
-								if(array_key_exists('ID', $attributeData)){
-									$attributeID = $attributeData['ID'];
-									$attributeValue->setValue('ID', $attributeID);	
-								}else{
-									$attributeValue->fromArray($attributeData);
-								}
+						break;
+					default:
+						if(in_array('Object.String', $attributeCfg['Definitions']) || in_array('Object.Number', $attributeCfg['Definitions']) ||
+						 		in_array('Object.Date', $attributeCfg['Definitions']) || in_array('Object.Boolean', $attributeCfg['Definitions'])){
+							
+						}else{
+							if(!is_scalar($attributeValue)){
 									
-								
-							}	
-						}
-					}		
-					break;
+								if(is_array($attributeValue)){
+									
+									$attributeData = $attributeValue;
+									$attributeValue = new KernelObject();
+									if(array_key_exists('ID', $attributeData)){
+										$attributeID = $attributeData['ID'];
+										$attributeValue->setValue('ID', $attributeID);	
+									}else{
+										$attributeValue->fromArray($attributeData);
+									}
+										
+									
+								}	
+							}
+						}		
+						break;
+				}
 			}
-		}
-		if($attributeValue instanceof KernelObject){
-			if($attributeValue->getValue('ID')!=''){
-				$this->addReferencedObject($attributeValue->getValue('ID'), $attributeName);
-				//$this->ReferencedObjects[] = array('ID'=>$attributeValue->getValue('ID'), 'Attribute'=>$attributeName);
+			
+			if($attributeValue instanceof KernelObject){
+				if($attributeValue->getValue('ID')!=''){
+					$this->addReferencedObject($attributeValue->getValue('ID'), $attributeName);
+					//$this->ReferencedObjects[] = array('ID'=>$attributeValue->getValue('ID'), 'Attribute'=>$attributeName);
+				}
 			}
+			
+			$this->AttributeValues[$attributeName] = $attributeValue;	
 		}
-		$this->AttributeValues[$attributeName] = $attributeValue;
 		
 		
 		return true;
@@ -1199,13 +1260,11 @@ class KernelObject{
 		if(array_key_exists('Actions', $inputData)){
 			if(is_array($inputData['Actions'])){
 				foreach($inputData['Actions'] as $eventName=>$action){
-					
 					foreach($action as $actionLabel=>$actionCfg){
-						
-						
-						$actionObject = $this->loadAction($actionCfg['Name'], (array_key_exists('Cfg', $actionCfg)?$actionCfg['Cfg']:null));
-						
-						$this->addAction($eventName, $actionLabel, $actionObject);
+						foreach($actionCfg as $actionName=>$actionData){
+							$actionObject = $this->loadAction($actionName, $actionData);
+							$this->addAction($eventName, $actionLabel, $actionObject);	
+						}
 					}
 				}	
 			}
@@ -1298,9 +1357,10 @@ class KernelObject{
 									if(!is_scalar($itemValue)){
 										if($itemValue instanceof KernelObject){
 											if(!$isPrimitive){
-												$itemValue = array('ID'=>($itemValue->getValue('ID')));
 												if($expandObjects==true){
 													$itemValue=$itemValue->toArray($returnDefinitions, $returnEvents, $returnActions, $returnAttributes, $returnPermissions, $returnErrors, $expandObjects);
+												}else{
+													$itemValue = array('ID'=>($itemValue->getValue('ID')));	
 												}
 											}else{
 												if($itemValue->getValue('ID')!='' && $expandObjects==false){
@@ -1315,7 +1375,6 @@ class KernelObject{
 								}
 								$attributeValue = $newValue;	
 							}
-							
 						}else{
 							if($attributeValue instanceof KernelObject){
 								if(!$isPrimitive){
@@ -1362,14 +1421,10 @@ class KernelObject{
 				$returnArray['Actions']=array();
 				foreach($actionList as $eventName=>$actions){
 					foreach($actions as $actionLabel=>$action){
-						
-						$actionCfg = array(
-							'Name'=>$action->getValue('ID'),
-							'Cfg'=>$action->toArray(false, false, true, false, false, false)
-						);
-						$returnArray['Actions'][$eventName][$actionLabel] = $actionCfg;
+						foreach($action as $actionName=>$actionData){
+							$returnArray['Actions'][$eventName][$actionLabel] = array($actionName=>$actionData);	
+						}
 					}
-					
 				}
 			}
 		}
@@ -1490,14 +1545,13 @@ class KernelObject{
 		if($this->eventsSuspended){
 			return true;
 		}
-		//fb('Firing Event: '.$eventName);
+		
 		$continue = true;
 
 		$actions = $this->getActions($eventName);
 		
 		if(is_array($actions)){
 			fb('- Firing Event: '.$eventName);
-			//fb('- '.count($actions).' Actions found');
 			foreach($actions as $actionLabel=>$action){
 				if($continue){
 					if($this->validateConditions($action->getValue('Conditions'))){
@@ -1506,6 +1560,7 @@ class KernelObject{
 					}
 				}
 			}
+			fb('- End Firing Event: '.$eventName);
 		}
 		
 		return $continue;
@@ -1550,6 +1605,7 @@ class KernelObject{
 		}
 		return null;
 	}
+	
 	protected function beforeRun(&$inputObject){
 		$this->ActionParent = $inputObject;
 		$continue = false;
@@ -1567,22 +1623,50 @@ class KernelObject{
 			
 			if($objectMap){
 				foreach($objectMap as $mapping){
-					
 					$sourceAttribute = $mapping->getValue('Source');
+					
 					$targetAttributes = $mapping->getValue('Targets');
 					$mapValue = null;
-					if(is_array($sourceAttribute)){
-						$sourceParts = explode($sourceAttribute);	
+					
+					if(strpos($sourceAttribute, '.')){
+						$sourceParts = explode('.', $sourceAttribute);	
 					}else{
 						$sourceParts = array($sourceAttribute);
 					}
 					
+					$sourceSubAttribute = false;
+					
+					if(count($sourceParts)>1){
+						$sourceAttribute = $sourceParts[0];
+						unset($sourceParts[0]);
+						$sourceSubAttribute = implode('.', $sourceParts);
+					}else{
+						$sourceSubAttribute = false;
+					}
+					
 					switch($sourceAttribute){
+						case 'InputObject':
+							$this->reverseMap[] = array(
+								'Source'=>$targetAttributes[0],
+								'Target'=>$sourceAttribute.'.'.$sourceSubAttribute
+							);
+							if($sourceSubAttribute){
+								$mapValue = $inputObject->getValue($sourceSubAttribute);
+							}else{
+								$mapValue = $inputObject;
+							}
+							break;
 						default:
-							$mapValue = $inputObject->getValue($sourceAttribute);
+							if($sourceSubAttribute){
+								$subItem = $this->getValue($sourceAttribute);
+								$mapValue = $subItem->getValue($sourceSubAttribute);
+								
+							}else{
+								$mapValue = $this->getValue($sourceAttribute);
+							}
 							break;
 					}
-
+					
 					foreach($targetAttributes as $target){
 						$this->setValue($target, $mapValue);
 					}
@@ -1600,6 +1684,14 @@ class KernelObject{
 	
 	protected function afterRun(&$inputObject){
 		$ran = $this->fireEvent('AfterRun');
+		
+		//reverse the object mapping
+		if($this->reverseMap){
+			foreach($this->reverseMap as $mapping){
+				$sourceValue = $this->getValue($mapping['Source']);
+				$this->setValue($mapping['Target'], $sourceValue);
+			}
+		}
 		return $ran;
 	}
 	
@@ -1610,6 +1702,7 @@ class KernelObject{
 		//$actionObject = $this->loadAction($actionName);
 		if($actionObject){
 			fb('--- Running Action: ('.$actionObject->getValue('ID').')');
+			//fb($actionObject);
 			$actionRan = $actionObject->run($this);
 		}
 		
@@ -1643,7 +1736,7 @@ class KernelObject{
 					if(class_exists($className)){
 						$actionObject = new $className();
 						
-						if($actionCfg){
+						if($actionCfg && is_array($actionCfg) && count($actionCfg)>0){
 							$actionObject->fromArray($actionCfg);	
 						}
 						return $actionObject;
@@ -1652,7 +1745,7 @@ class KernelObject{
 						return false;
 					}
 				}else{
-					$this->addError('Could not Load Action: '.$actionName.'. Invalid File Name.', $fileString);
+					$this->addError('Could not Load Action: '.$actionName.'. Invalid File Name. '. $fileString);
 					return false;
 				}
 			}
@@ -1661,20 +1754,22 @@ class KernelObject{
 
 	public function addReferencedObject($objectID, $attribute){
 		$exists=false;
-		if(is_array($this->ReferencedObjects)){
-			for($i=0;$i<count($this->ReferencedObjects);$i++){
-				$refObject = $this->ReferencedObjects[$i]; 
-				if($refObject['ID']==$objectID){
-					$attributeName = $refObject['Attribute'];
-					if($attributeName==$attribute){
-						$exists=true;	
+		if($objectID){
+			if(is_array($this->ReferencedObjects)){
+				for($i=0;$i<count($this->ReferencedObjects);$i++){
+					$refObject = $this->ReferencedObjects[$i]; 
+					if($refObject['ID']==$objectID){
+						$attributeName = $refObject['Attribute'];
+						if($attributeName==$attribute){
+							$exists=true;	
+						}
 					}
 				}
 			}
-		}
-		
-		if(!$exists){
-			$this->ReferencedObjects[] = array('ID'=>$objectID, 'Attribute'=>$attribute);
+			
+			if(!$exists){
+				$this->ReferencedObjects[] = array('ID'=>$objectID, 'Attribute'=>$attribute);
+			}	
 		}
 	}
 
@@ -1685,18 +1780,13 @@ class KernelObject{
 				if($this->ReferencedObjects[$i]['ID']==$objectID){
 					$attributeName = $this->ReferencedObjects[$i]['Attribute'];
 					$this->removeValue($attributeName, $objectID);
-					//fb($this->ReferencedObjects[$i]);
 					$removeIndex=$i;
-					//unset($this->ReferencedObjects[$i]);
 				}
 			}
 		}
 		
 		if($removeIndex>-1){
-			fb('unsetting');
-			fb(count($this->ReferencedObjects));
 			unset($this->ReferencedObjects[$removeIndex]);
-			fb(count($this->ReferencedObjects));
 		}
 	}
 

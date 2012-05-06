@@ -5,7 +5,7 @@ class KernelActionsStop extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.Stop');
+		$this->setValue('ID','Kernel.Actions.Stop');
 		$this->setValue('Name','Stop');
 		$this->setValue('Description', 'Prevents any more actions from being fired for the Event');
 		$this->setValue('Author', 'Justin Pradier');

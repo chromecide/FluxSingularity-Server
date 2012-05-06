@@ -5,7 +5,7 @@ class KernelActionsSetTraceLevel extends KernelObject{
 		
 		$this->addDefinition('Kernel.Action');
 		
-		$this->setObjectName('Kernel.Action.SetTraceLevel');
+		$this->setObjectName('Kernel.Actions.SetTraceLevel');
 		$this->setObjectDescription('Set the Trace Level for an Object');
 		$this->setObjectAuthor('Justin Pradier');
 		$this->setObjectVersion('1.0.0');

@@ -40,13 +40,14 @@ class KernelActionsCreateAPISession extends KernelObject{
 				//load the guest user
 				$user = new KernelObject('Object.Security.User');
 				$user->load(self::$GuestUserId);
+				$sessionObject->setValue('User', $user);
+			}else{
+				$sessionObject->setValue('User', $user);
 			}
 
-			//$sessionObject->setValue('User', $user);
 			$sessionObject->setValue('LastAccessed', strtotime(date('Y-m-d H:i:s')));
 			
 			if(!$sessionObject->save()){
-				
 				$inputObject->addError('Could not create Session', $sessionObject);
 				return false;
 			}else{
@@ -56,7 +57,6 @@ class KernelActionsCreateAPISession extends KernelObject{
 				$this->setValue('Session', $sessionObject);
 				$inputObject->setValue('Session', $sessionObject);
 				$_SESSION['APISessionID'] = $sessionObject->getValue('ID');
-				$_SESSION['API_Session'] = $sessionObject->getValue('ID');// TODO: still needed????
 			}
 			return parent::afterRun($inputObject);
 			

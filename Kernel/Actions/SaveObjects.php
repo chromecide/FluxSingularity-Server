@@ -5,7 +5,7 @@ class KernelActionsSaveObjects extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.SaveObjects');
+		$this->setValue('ID','Kernel.Actions.SaveObjects');
 		$this->setValue('Name','Save Objects');
 		$this->setValue('Description', 'Saves Objects');
 		$this->setValue('Author', 'Justin Pradier');

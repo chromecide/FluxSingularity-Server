@@ -5,7 +5,7 @@ class KernelActionsLoadAPISessionByToken extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.LoadAPISessionByToken');
+		$this->setValue('ID','Kernel.Actions.LoadAPISessionByToken');
 		$this->setValue('Name','Load API Session by Token');
 		$this->setValue('Description', 'Loads an API Session using the supplied Token.  The Token must exist in the Session\'s Tokens Collection');
 		$this->setValue('Author', 'Justin Pradier');
@@ -50,7 +50,7 @@ class KernelActionsLoadAPISessionByToken extends KernelObject{
 				if(count($results)==1){
 					$sessionObject = $results[0];
 					$this->setValue('Session', $sessionObject);
-					fb('Session Loaded');
+					$inputObject->setValue('Session', $sessionObject);
 					$continue = $this->fireEvent('SessionLoaded');
 					
 				}else{

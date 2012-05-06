@@ -5,7 +5,7 @@ class KernelActionsClearActions extends KernelObject{
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Action.ClearActions');
+		$this->setValue('ID','Kernel.Actions.ClearActions');
 		$this->setValue('Name','Clear Actions');
 		$this->setValue('Description', 'Clears Action Values from an object.');
 		$this->setValue('Author', 'Justin Pradier');

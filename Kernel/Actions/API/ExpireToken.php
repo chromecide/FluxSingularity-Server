@@ -1,43 +1,38 @@
 <?php
-class KernelActionsExpireToken extends KernelObject{
+class KernelActionsAPIExpireToken extends KernelObject{
 	public function __construct($cfg=null){
 		parent::__construct($cfg);
 		
 		$this->useDefinition('Object.Action');
 		
-		$this->setValue('ID','Kernel.Actions.ExpireToken');
-		$this->setValue('Name','Expire Token');
+		$this->setValue('ID','Kernel.Actions.API.ExpireToken');
+		$this->setValue('Name','Expire API Token');
 		$this->setValue('Description', 'Expires a Token so it cannot be reused.');
 		$this->setValue('Author', 'Justin Pradier');
 		$this->setValue('Version', '1.0.0');
 		
-		$this->addAttribute('TokenID', 'Object.String', false, false);
+		$this->addAttribute('Session', array('Object.String', 'API.Session'), true, false);
+		$this->addAttribute('Token', array('Object.String', 'API.Token'), true, false);
 	}
 	
 	public function run(&$inputObject){
 		if(!parent::beforeRun($inputObject)){
 			return false;
 		}
+		
+		$tokenID = false;
+		$session = $this->getValue('Session');
+		
+		$token = $this->getValue('Token');
 		$tokenObject = null;
 		
-		if(($inputObject instanceof KernelObject) && $inputObject->usesDefinition('API.Token')){
-			$tokenObject = $inputObject;
+		if($token instanceof KernelObject){
+			$tokenObject = $token;
+			$tokenID = $token->getValue('ID');
 		}else{
-			
-			$tokenID = $this->getValue('TokenID');
-			
-			if(!$tokenID){
-				$inputObject->addError('Invalid Token Supplied 1', $tokenID);
-				return false;
-			}
-			
-			$tokenObject = new KernelObject('API.Token');
-			
-			if(!$tokenObject->load($tokenID)){
-				$inputObject->addError('Invalid Token Supplied 2', $inputObject);
-				
-				return false;
-			}
+			$tokenID = $token;
+			$tokenObject = new KernelObject();
+			$tokenObject->load($tokenID);
 		}
 		
 		if($tokenObject){
@@ -49,11 +44,9 @@ class KernelActionsExpireToken extends KernelObject{
 			$condition->setValue('Operator', '==');
 			$condition->setValue('Value', $tokenID);
 			$query->addValue('Conditions', $condition);
-			
 			if($query->find()){
 				$results = $query->getValue('Results');
 				foreach($results as &$object){
-					//fb('--------- Removing Reference from: '.$object->getValue('ID'));
 					$object->removeReferencedObject($tokenID);
 					$object->save();
 				}
@@ -61,10 +54,12 @@ class KernelActionsExpireToken extends KernelObject{
 				if(!$tokenObject->remove()){
 					$inputObject->addError('Could not Remove Token', $tokenObject);
 					return false;
-				}	
+				}
+
+				if($session){
+					$session->removeReferencedObject($tokenID);
+				}
 			}
-			
-			
 		}
 		
 		return parent::afterRun($inputObject);

@@ -5,7 +5,7 @@ class KernelActionsFireEvent extends KernelObject{
 		
 		$this->addDefinition('Kernel.Action');
 		
-		$this->setObjectName('Kernel.Action.FireEvent');
+		$this->setObjectName('Kernel.Actions.FireEvent');
 		$this->setObjectDescription('Fires an Event on an Object');
 		$this->setObjectAuthor('Justin Pradier');
 		$this->setObjectVersion('1.0.0');
