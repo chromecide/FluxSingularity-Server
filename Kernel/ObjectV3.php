@@ -85,9 +85,9 @@ class KernelObject{
 			$definitionModel = $definitionObject;
 			$definitionID = $definitionModel['Data']['ID'];
 			$definitionName = $definitionModel['Data']['Name'];
-			$this->model['Definitions'][$definitionID]=$definitionName;
+			$this->model['Definitions'][]=$definitionID;
 		}
-		
+		fb($this->model);
 		return $this->fireEvent('AfterUseDefinition');
 	}
 	
@@ -113,7 +113,7 @@ class KernelObject{
 		}
 		
 		$definitionModel = $definitionObject->getModel();
-		foreach($this->model['Definitions'] as $existingDefinitionID=>$existingDefinitionName){
+		foreach($this->model['Definitions'] as $existingDefinitionID){
 			$existingDefinition = new KernelObject();
 			$existingDefinition->loadById($existingDefinitionID);
 			$existingModel = $existingDefinition->getModel();
@@ -128,7 +128,7 @@ class KernelObject{
 	
 	
 	public function getDefinition($definitionID){
-		if(array_key_exists($definitionID, $this->model['Definitions'])){
+		if(in_array($definitionID, $this->model['Definitions'])){
 			$definitionObject = new KernelObject();
 			$definitionObject->loadById($definitionID);
 			return $definitionObject;
@@ -138,7 +138,7 @@ class KernelObject{
 	}
 	
 	public function removeDefinition($definition){
-		foreach($this->model['Definitions'] as $existingDefinitionID=>$existingDefinitionName){
+		foreach($this->model['Definitions'] as $existingDefinitionID){
 			$existingDefinition = new KernelObject();
 			$existingDefinition->loadById($existingDefinitionID);
 			if($existingDefinition->getValue('ID')==$definitionObject->getValue('ID')){
@@ -209,7 +209,7 @@ class KernelObject{
 	public function hasAttribute($attributeName){
 		$hasAttribute = false;
 		if(!array_key_exists($attributeName, $this->model['Attributes'])){
-			foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+			foreach($this->model['Definitions'] as $definitionID){
 				$definitionObject = new KernelObject();
 				$definitionObject->loadById($definitionID);
 				if($definitionObject->hasAttribute($attributeName)){
@@ -231,7 +231,7 @@ class KernelObject{
 				if(array_key_exists($attributeName, $this->model['Attributes'])){
 					$returnValue = &$this->model['Attributes'][$attributeName];	
 				}else{
-					foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+					foreach($this->model['Definitions'] as $definitionID){
 						$definition = new KernelObject();
 						$definition->loadById($definitionID);
 						
@@ -252,7 +252,7 @@ class KernelObject{
 		if(!$attributeArray){
 			$attributeArray = array();
 		}
-		foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+		foreach($this->model['Definitions'] as $definitionID){
 			$definition = new KernelObject();
 			$definition->loadById($definitionID);
 			$attributeArray = array_merge($definition->getAttributes(), $attributeArray);
@@ -290,7 +290,7 @@ class KernelObject{
 					$hasEvent = true;
 				}else{
 					if(array_key_exists('Definitions', $this->model)){
-						foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+						foreach($this->model['Definitions'] as $definitionID){
 							$definition = new KernelObject();
 							$definition->loadById($definitionID);
 							
@@ -303,7 +303,7 @@ class KernelObject{
 				}	
 			}else{
 				if(array_key_exists('Definitions', $this->model)){
-					foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+					foreach($this->model['Definitions'] as $definitionID){
 						$definition = new KernelObject();
 						$definition->loadById($definitionID);
 						
@@ -354,7 +354,7 @@ class KernelObject{
 				$definitionSubscribers = array();
 				$definitionEventName = $eventName;
 				
-				foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+				foreach($this->model['Definitions'] as $definitionID){
 					$definitionObject = $this->getDefinition($definitionID);
 					if(substr($eventName, strlen($eventName)-8, 8)!='Instance'){
 						$definitionEventName = $eventName.'Instance';
@@ -519,7 +519,7 @@ class KernelObject{
 				
 				if(!$actionObject){ //one of the definitions used must be the action object
 					
-					foreach($this->model['Definitions'] as $definitionID=>$defintionName){
+					foreach($this->model['Definitions'] as $definitionID){
 						$definition = new KernelObject();
 						$definition->loadById($definitionID);
 						if($definition->usesDefinition('Object.Action')){
@@ -585,24 +585,41 @@ class KernelObject{
 					}
 					
 					
+					$conditionsValid = true;
+						
 					if(is_array($objectCfg)){
 						$conditions = $objectCfg['Conditions'];
 						$objectMap = $objectCfg['ObjectMap'];
-						if($objectMap){
-							foreach($objectMap as $mapping){
-								$mapSource = $mapping['Source'];
-								$mapTargets = $mapping['Targets'];
-								
-								$sourceValue = $eventObject->getValue($mapSource);
-								
-								foreach($mapTargets as $targetAttributeName){
-									$subscriberObject->setValue($targetAttributeName, $sourceValue);
+						
+						if($conditions){
+							//if any conditions fail, set conditionsValid to false
+							foreach($conditions as $condition){
+								if(!$this->validateCondition($condition, $eventObject)){
+									$conditionsValid = false;
+									break;
 								}
 							}
 						}
+						
+						if($conditionsValid){
+							if($objectMap){
+								foreach($objectMap as $mapping){
+									$mapSource = $mapping['Source'];
+									$mapTargets = $mapping['Targets'];
+									
+									$sourceValue = $eventObject->getValue($mapSource);
+									
+									foreach($mapTargets as $targetAttributeName){
+										$subscriberObject->setValue($targetAttributeName, $sourceValue);
+									}
+								}
+							}
+						}
+						
 					}
-					
-					$returnArray[] = $subscriberObject;
+					if($conditionsValid){
+						$returnArray[] = $subscriberObject;	
+					}
 				}
 			}
 		}
@@ -682,6 +699,60 @@ class KernelObject{
 				
 			}
 		}
+	}
+
+	public function validateCondition($condition, $object=null){
+		$valid = false;
+		if(!$object){
+			$object = $this;
+		}
+		if($condition instanceof KernelObject){
+			
+		}else{
+			if(is_array($condition)){
+				
+				$attributeName = $condition['Attribute'];
+				$operator = $condition['Operator'];
+				$value = $condition['Value'];
+				
+				$attributeValue = $object->getValue($attributeName);
+				switch($conditionOperator){
+					case '>':
+						$valid = ($attributeValue>$value);
+						break;
+					case '>=':
+						$valid = ($attributeValue>=$value);
+						break;
+					case '<':
+						$valid = ($attributeValue<$value);
+						break;
+					case '<=':
+						$valid = ($attributeValue<=$value);
+						break;
+					case '!=':
+						$valid = ($attributeValue!=$value);
+						break;
+					case 'IN':
+						if(is_array($attributeValue)){
+							
+						}
+						break;
+					case 'NIN':
+						
+						break;
+					case 'EXISTS':
+						
+						break;
+					case '==':
+					default:
+						fb('validating condition');
+						$valid = ($attributeValue==$value);
+						break;
+				}
+			}
+		}
+		
+		return $valid;
 	}
 	/*
 	 * End Action Methods 
@@ -809,6 +880,8 @@ class KernelObject{
 								fb($attributeCfg);
 								fb($this->model);
 								fb('--==--');
+								fb(debug_backtrace());
+								fb('-==-');
 							}	
 						}	
 					}
@@ -855,7 +928,6 @@ class KernelObject{
 					$thisObjectAttribute = explode('.', $attributeNameString, 2);
 					
 					if($thisObjectAttribute[0]=='InputObject'){
-						fb(debug_backtrace());
 						$thisObjectValue = $this->ActionParent;
 					}else{
 						$thisObjectValue = $this->getValue($thisObjectAttribute[0]);
@@ -895,7 +967,7 @@ class KernelObject{
 				
 				if(!$returnValue && $attributeName!='ID' && $this->returnDefaults){
 					//see if any of the definitions have a value for this attribute
-					foreach($this->model['Definitions'] as $definitionID=>$definitionName){
+					foreach($this->model['Definitions'] as $definitionID){
 						$definition = new KernelObject();
 						$definition->loadById($definitionID);
 						if($definition->hasAttribute(func_get_arg(0))){
@@ -1187,13 +1259,16 @@ class KernelObject{
 		if($argCount==0){ //building a query from the current objects values
 			$ds = $this->getDataSource();
 			$result = $ds->findOne($this);
-			$this->setModel($result);
-			return true;
-			//fb($this);
+			
+			if($result){
+			
+				$this->setModel($result);
+				return true;	
+			}
 		}else{ //using supplied information
 			
 		}
-		
+		return false;
 	}
 	
 	public function find(){
@@ -1205,7 +1280,7 @@ class KernelObject{
 		}else{ //using supplied information
 			
 		}
-		
+		return $result;
 	}
 	
 	public function save(){
