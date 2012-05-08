@@ -30,8 +30,6 @@ class ModulesWebsiteActionsLoadPage extends KernelObject{
 		
 		$domain = $this->getValue('DomainName');
 		$path = $this->getValue('PathName');
-		
-		//first load the domain
 		$domainObject = new KernelObject();
 		$domainObject->useDefinition('Modules.Website.Object.Domain');
 		$domainObject->setValue('Domain', $domain);
@@ -47,14 +45,18 @@ class ModulesWebsiteActionsLoadPage extends KernelObject{
 				$page->setValue('Path', $path);
 				if($page->findOne()){
 					$this->setValue('Page', $page);	
+					
 					$this->fireEvent('PageLoaded');
 				}else{
+					fb('Page Not Found');
 					$this->fireEvent('PageNotLoaded');
 				}	
 			}else{
+				fb('No Site found for domain');
 				$this->fireEvent('PageNotLoaded');
 			}
 		}else{
+			fb('Domain Not Found');
 			$this->fireEvent('PageNotLoaded');
 		}
 
