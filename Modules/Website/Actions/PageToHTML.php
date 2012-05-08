@@ -6,7 +6,7 @@ class ModulesWebsiteActionsPageToHTML extends KernelObject{
 		$this->useDefinition('Object.Action');
 		
 		$this->setValue('ID','Modules.Website.Actions.PageToHTML');
-		$this->setValue('Name','Page To HTML');
+		$this->setValue('Name','Modules.Website.Actions.PageToHTML');
 		$this->setValue('Description', 'Converts a Page Object to HTML');
 		$this->setValue('Author', 'Justin Pradier');
 		$this->setValue('Version', '1.0.0');

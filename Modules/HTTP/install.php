@@ -22,7 +22,7 @@
 			$moduleDefinition = new KernelObject();
 			$moduleDefinition->useDefinition('Object.Module');
 			$moduleDefinition->setValue('ID', 'Modules.HTTP');
-			$moduleDefinition->setValue('Name', 'HTTP Module');
+			$moduleDefinition->setValue('Name', 'Modules.HTTP');
 			$moduleDefinition->setValue('Author', 'Justin Pradier');
 			$moduleDefinition->setValue('Version', '1.0.0');
 			
@@ -50,7 +50,7 @@
 					$requestDefinition = new KernelObject();
 					$requestDefinition->useDefinition('Object.Definition');
 					$requestDefinition->setValue('ID', 'Modules.HTTP.Object.Request');
-					$requestDefinition->setValue('Name', 'HTTP Request Object');
+					$requestDefinition->setValue('Name', 'Modules.HTTP.Object.Request');
 					$requestDefinition->setValue('Description', 'HTTP Request Object Definition');
 					$requestDefinition->setValue('Author', 'Justin Pradier');
 					$requestDefinition->setValue('Version', '1.0.0');
@@ -80,7 +80,7 @@
 					$responseDefinition = new KernelObject();
 					$responseDefinition->useDefinition('Object.Definition');
 					$responseDefinition->setValue('ID','Modules.HTTP.Object.Response');
-					$responseDefinition->setValue('Name', 'HTTP Response Object');
+					$responseDefinition->setValue('Name', 'Modules.HTTP.Object.Response');
 					$responseDefinition->setValue('Description', 'HTTP Response Object Definition');
 					$responseDefinition->setValue('Author', 'Justin Pradier');
 					$responseDefinition->setValue('Version', '1.0.0');

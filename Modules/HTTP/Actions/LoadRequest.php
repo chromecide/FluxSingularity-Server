@@ -6,7 +6,7 @@ class ModulesHTTPActionsLoadRequest extends KernelObject{
 		$this->useDefinition('Object.Action');
 		
 		$this->setValue('ID','Modules.HTTP.Actions.LoadRequest');
-		$this->setValue('Name','Load HTTP Request');
+		$this->setValue('Name','Modules.HTTP.Actions.LoadRequest');
 		$this->setValue('Description', 'Loads the values from a HTTP Request');
 		$this->setValue('Author', 'Justin Pradier');
 		$this->setValue('Version', '1.0.0');

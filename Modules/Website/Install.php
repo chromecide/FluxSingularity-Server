@@ -7,7 +7,7 @@
 			$this->useDefinition('Object.Action');
 			
 			$this->setValue('ID','Modules.Website.Install');
-			$this->setValue('Name','Website Module Installer');
+			$this->setValue('Name','Modules.Website.Install');
 			$this->setValue('Description', 'Installs the Website Module');
 			$this->setValue('Author', 'Justin Pradier');
 			$this->setValue('Version', '1.0.0');
@@ -22,7 +22,7 @@
 			$moduleDefinition = new KernelObject();
 			$moduleDefinition->useDefinition('Object.Module');
 			$moduleDefinition->setValue('ID', 'Modules.Website');
-			$moduleDefinition->setValue('Name', 'Website Module');
+			$moduleDefinition->setValue('Name', 'Modules.Website');
 			$moduleDefinition->setValue('Author', 'Justin Pradier');
 			$moduleDefinition->setValue('Version', '1.0.0');
 			
@@ -37,7 +37,7 @@
 					$domainDefinition = new KernelObject();
 					$domainDefinition->useDefinition('Object.Definition');
 					$domainDefinition->setValue('ID','Modules.Website.Object.Domain');
-					$domainDefinition->setValue('Name', 'Domain Object');
+					$domainDefinition->setValue('Name', 'Modules.Website.Object.Domain');
 					$domainDefinition->setValue('Description', 'Domain Object Definition');
 					$domainDefinition->setValue('Author', 'Justin Pradier');
 					$domainDefinition->setValue('Version', '1.0.0');
@@ -50,7 +50,7 @@
 					$websiteDefinition = new KernelObject();
 					$websiteDefinition->useDefinition('Object.Definition');
 					$websiteDefinition->setValue('ID','Modules.Website.Object.Website');
-					$websiteDefinition->setValue('Name', 'Website Object');
+					$websiteDefinition->setValue('Name', 'Modules.Website.Object.Website');
 					$websiteDefinition->setValue('Description', 'Website Object Definition');
 					$websiteDefinition->setValue('Author', 'Justin Pradier');
 					$websiteDefinition->setValue('Version', '1.0.0');
@@ -64,7 +64,7 @@
 					$headerDefinition = new KernelObject();
 					$headerDefinition->useDefinition('Object.Definition');
 					$headerDefinition->setValue('ID','Modules.Website.Object.ContentBlock');
-					$headerDefinition->setValue('Name', 'Header Object');
+					$headerDefinition->setValue('Name', 'Modules.Website.Object.ContetBlock');
 					$headerDefinition->setValue('Description', 'Website Page Header Definition');
 					$headerDefinition->setValue('Author', 'Justin Pradier');
 					$headerDefinition->setValue('Version', '1.0.0');
@@ -78,7 +78,7 @@
 					$pageDefinition = new KernelObject();
 					$pageDefinition->useDefinition('Object.Definition');
 					$pageDefinition->setValue('ID','Modules.Website.Object.Page');
-					$pageDefinition->setValue('Name', 'Website Page Object');
+					$pageDefinition->setValue('Name', 'Modules.Website.Object.Page');
 					$pageDefinition->setValue('Description', 'Website Page Object Definition');
 					$pageDefinition->setValue('Author', 'Justin Pradier');
 					$pageDefinition->setValue('Version', '1.0.0');

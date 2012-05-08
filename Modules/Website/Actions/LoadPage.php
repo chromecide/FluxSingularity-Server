@@ -6,7 +6,7 @@ class ModulesWebsiteActionsLoadPage extends KernelObject{
 		$this->useDefinition('Object.Action');
 		
 		$this->setValue('ID','Modules.Website.Actions.LoadPage');
-		$this->setValue('Name','Load Page');
+		$this->setValue('Name','Modules.Website.Actions.LoadPage');
 		$this->setValue('Description', 'Loads a Website Page');
 		$this->setValue('Author', 'Justin Pradier');
 		$this->setValue('Version', '1.0.0');
