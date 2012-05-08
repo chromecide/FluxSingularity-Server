@@ -330,6 +330,12 @@ class KernelObject{
 		}
 	}
 	
+	public function getEvents(){
+		if(is_array($this->model['Events'])){
+			return $this->model['Events'];
+		}
+	}
+	
 	public function removeEvent(){
 		
 	}
@@ -1099,7 +1105,7 @@ class KernelObject{
 					$this->addAttribute('Version', array('Object.String'), true);
 					
 					$this->setValue('ID', 'Object');
-					$this->setValue('Name', 'Base Object');
+					$this->setValue('Name', 'Object');
 					$this->setValue('Description', 'Base Object definition that all other objects are built from');
 					$this->setValue('Author', 'Justin Pradier');
 					$this->setValue('Version', '1.0.0');
@@ -1147,7 +1153,7 @@ class KernelObject{
 					$this->addAttribute('Targets', array('Object.String'), true, true);
 					
 					$this->setValue('ID', 'Object.AttributeMap');
-					$this->setValue('Name', 'Object Attribute Map');
+					$this->setValue('Name', 'Object.AttributeMap');
 					$this->setValue('Description', 'Object to Object Attribute Mapping');
 					$this->setValue('Author', 'Justin Pradier');
 					$this->setValue('Version', '1.0.0');
@@ -1158,7 +1164,7 @@ class KernelObject{
 					$this->useDefinition('Object');
 					
 					$this->setValue('ID', 'Object.Module');
-					$this->setValue('Name', 'Object Module Definition');
+					$this->setValue('Name', 'Object.Module');
 					$this->setValue('Description', 'Object Module Definition');
 					$this->setValue('Author', 'Justin Pradier');
 					$this->setValue('Version', '1.0.0');
@@ -1172,7 +1178,7 @@ class KernelObject{
 					$this->suspendEvents();
 					$this->useDefinition('Object');
 					$this->setValue('ID', 'Object.Action');
-					$this->setValue('Name', 'Action Definition');
+					$this->setValue('Name', 'Object.Action');
 					$this->setValue('Description', 'Base Action definition that all other Actions are built from');
 					$this->setValue('Author', 'Justin Pradier');
 					$this->setValue('Version', '1.0.0');
