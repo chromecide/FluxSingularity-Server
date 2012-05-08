@@ -150,7 +150,7 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
 			if($queryObject->getValue('_QuerySort')){
 				$sortFieldName = $queryObject->getValue('_QuerySort');
 			}else{
-				$sortFieldName = 'Definitions';
+				$sortFieldName = 'Data.Name';
 			}
 			
 			$cursor = $collection->find($fullQuery)->sort(array($sortFieldName=>0));
