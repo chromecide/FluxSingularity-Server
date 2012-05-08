@@ -88,8 +88,17 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
     		}else{
     			//$queryObject->addField('Results', 'Kernel.Object', false, true);
     			//basic object based query
-    			
+    			$queryModel = $queryObject->getModel();
 				$queryObject->returnDefaults = false;
+				
+				$definitions = $queryModel['Definitions'];
+				if(count($definitions)>0){
+					$mongoQuery['Definitions']=array();
+					foreach($definitions as $definitionID){
+						$mongoQuery['Definitions'] = $definitionID;
+					}	
+				}
+				
 				foreach($queryAttributes as $attributeName=>$attributeCfg){
 					$attributeValue = $queryObject->getValue($attributeName);
 					$definitions = array();
@@ -129,22 +138,26 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
 						}
 					}
 				}
-				$fullQuery = array('$and'=>array($mongoQuery));
+
+				if(count($mongoQuery)==0){
+					$fullQuery = array();
+				}else{
+					$fullQuery = array('$and'=>array($mongoQuery));	
+				}
+				
     		}
     		
 			if($queryObject->getValue('_QuerySort')){
 				$sortFieldName = $queryObject->getValue('_QuerySort');
 			}else{
-				$sortFieldName = '_id';
+				$sortFieldName = 'Definitions';
 			}
-			fb($fullQuery);
+			
 			$cursor = $collection->find($fullQuery)->sort(array($sortFieldName=>0));
 			
 			if($cursor){
 				while( $cursor->hasNext() ) {
-					$resultObject = new KernelObject();
-					$this->populateObject($resultObject, $cursor->getNext());
-					$returnArray[] = $resultObject;
+					$returnArray[] = $cursor->getNext();
 				}	
 			}
 			
@@ -155,8 +168,8 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
 			$returnArray = array();
 		}
 		
-		$queryObject->setValue('QueryString', json_encode($fullQuery));
-		$queryObject->setValue('Results', $returnArray);
+		//$queryObject->setValue('QueryString', json_encode($fullQuery));
+		//$queryObject->setValue('Results', $returnArray);
 		
 		return $returnArray;
     }
@@ -225,7 +238,8 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
 			$resultObject = $collection->findOne($mongoQuery);
 			
 			if($resultObject){
-				$finalResult = $this->populateObject(&$queryObject, $resultObject);
+				//$finalResult = $this->populateObject(&$queryObject, $resultObject);
+				return $resultObject;
 				return true;
 			}else{
 				return false;
@@ -250,6 +264,10 @@ class KernelDataDriverMongoDBv3 extends KernelDataDriver {
 			$itemId = false;
 			
 			if(array_key_exists('ID', $model['Data'])){
+				$itemId = $model['Data']['ID'];	
+			}
+			
+			if(array_key_exists('Definitions', $model)){
 				$itemId = $model['Data']['ID'];	
 			}
 			
