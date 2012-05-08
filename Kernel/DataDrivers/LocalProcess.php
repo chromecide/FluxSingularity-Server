@@ -65,12 +65,13 @@ class KernelDataDriverLocalProcess extends KernelDataDriver {
 				$conditions[$attributeID] = $attrValue;
 			}
 		}
-		
+		fb($conditions);
 		foreach(self::$objectCache as $result){
 			$resultMatch = true;
 			foreach($conditions as $attrName=>$attrValue){
 				if($result['Data'][$attrName]!=$attrValue){
 					$resultMatch = false;
+					break;
 				}
 			}
 			if($resultMatch){
